@@ -28,7 +28,9 @@ lfs = {}
 --- This function uses stat internally thus if the given filepath is a symbolic link, it is followed (if it points to another link the chain is followed recursively)
 --- and the information is about the file it refers to. To obtain information about the link itself, see function lfs.symlinkattributes.
 ---@param path string
----@return lfs.attributes
+---@return lfs.attributes | nil
+---@return string | nil
+---@return integer | nil
 function lfs.attributes(path) end
 
 ---@param path string
@@ -139,7 +141,9 @@ function lfs.setmode(file, mode) end
 --- It also adds a target field, containing the file name that the symlink points to. On Windows this function does not yet support links,
 --- and is identical to lfs.attributes.
 ---@param path string
----@return lfs.attributes
+---@return lfs.attributes | nil
+---@return string | nil
+---@return integer | nil
 function lfs.symlinkattributes(path) end
 
 ---@param path string

@@ -1495,7 +1495,7 @@ __fileFuncs__["__main__"] = function()
 
 	ClassSystem.Deconstructing = Configs.Deconstructing
 	ClassSystem.IsAbstract = Configs.AbstractPlaceholder
-	ClassSystem.IsInterface = Configs.InterfacePlaceholder --//TODO: how to find better name
+	ClassSystem.IsInterface = Configs.InterfacePlaceholder
 
 	ClassSystem.ObjectType = ObjectType
 

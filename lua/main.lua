@@ -43,4 +43,8 @@ if not lfs_status then
 end
 require("lua-cmake.third_party.derFreemaker.ClassSystem")
 
-
+local cli_parser = require("lua-cmake.third_party.other.cli_parser")
+local parser = cli_parser("lua-cmake", "Used to generate cmake files configured from lua.")
+parser:argument("entry", "The entry file for lua-cmake.", "cmake.lua")
+---@type { entry: string }
+local args = parser:parse()

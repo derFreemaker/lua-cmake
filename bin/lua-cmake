@@ -1,1 +1,3 @@
-lua ${LUA_CMAKE_DIR}/main.lua
+#/usr/bin/bash
+
+lua ${LUA_CMAKE_DIR}/lua/main.lua %*
