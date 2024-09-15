@@ -43,4 +43,4 @@ if not lfs_status then
 end
 require("lua-cmake.third_party.derFreemaker.ClassSystem")
 
-print(lfs.currentdir())
+

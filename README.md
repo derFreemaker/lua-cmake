@@ -7,9 +7,8 @@ Lua wrapper for cmake.
 3. Set `LUA_CMAKE_DIR` to `{your_repo_path}`
 
 ## Goal
-The goal is to make writing complex system in cmake easier by make you able to configure in lua.
-The way it works is it generates a cmake file based on the configuration.
-This makes you able to use all the cmake features but configure in lua which makes lists or arrays way easier and simpler.
+The goal is to make writing complex system in cmake easier by making you able to configure in lua.
+The way it works is it generates a cmake file based on the configuration, this makes you able to use all the cmake features.
 
 ## Builtin Systems
 - For filesystem interactions [LuaFileSystem](https://lunarmodules.github.io/luafilesystem) is comming with it and can be required directly like so `require("lfs")`.
