@@ -1,0 +1,16 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "compile",
+            "type": "shell",
+            "command": "lua",
+            "args": [
+                "${workspaceFolder}\\third_party\\ers35\\luastatic.lua",
+                "main.lua",
+                "${workspaceFolder}\\third-party\\derFreemaker\\ClassSystem.lua"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}
