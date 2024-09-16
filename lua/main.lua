@@ -46,5 +46,30 @@ require("lua-cmake.third_party.derFreemaker.ClassSystem")
 local cli_parser = require("lua-cmake.third_party.other.cli_parser")
 local parser = cli_parser("lua-cmake", "Used to generate cmake files configured from lua.")
 parser:argument("entry", "The entry file for lua-cmake.", "cmake.lua")
+
 ---@type { entry: string }
 local args = parser:parse()
+
+--//TODO: add version flag
+
+local fullEntryPath = lfs.currentdir() .. args.entry
+if lfs.attributes(fullEntryPath) == nil then
+    error("Entry file not found: " .. fullEntryPath)
+end
+
+---@type lua-cmake.CMake
+CMake = require("lua-cmake.lua.cmake.cmake")
+
+local function runEntry()
+    require(args.entry)
+end
+
+local Task = require("lua-cmake.lua.common.task")
+
+---@type lua-cmake.Task
+local entryTask = Task(runEntry)
+entryTask:Execute()
+
+if not entryTask:IsSuccess() then
+    
+end
