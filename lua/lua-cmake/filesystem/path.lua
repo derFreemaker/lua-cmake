@@ -1,10 +1,10 @@
 ---@type lfs
 local lfs = require("lfs")
 
----@type lua-cmake.Utils.String
-local String = require("lua-cmake.lua.utils.string")
----@type lua-cmake.Utils.Table
-local Table = require("lua-cmake.lua.utils.table")
+---@type lua-cmake.utils.string
+local utils_string = require("lua-cmake.lua.utils.string")
+---@type lua-cmake.utils.table
+local utils_table = require("lua-cmake.lua.utils.table")
 
 ---@param str string
 ---@return string str
@@ -13,14 +13,14 @@ local function formatStr(str)
     return str
 end
 
----@class lua-cmake.FileSystem.Path : object
+---@class lua-cmake.filesystem.path : object
 ---@field private m_nodes string[]
----@overload fun(pathOrNodes: (string | string[])?) : lua-cmake.FileSystem.Path
-local Path = {}
+---@overload fun(pathOrNodes: (string | string[])?) : lua-cmake.filesystem.path
+local path = {}
 
 ---@param str string
 ---@return boolean isNode
-function Path.Static__IsNode(str)
+function path.Static__is_node(str)
     if str:find("/") then
         return false
     end
@@ -30,7 +30,7 @@ end
 
 ---@private
 ---@param pathOrNodes string | string[]
-function Path:__init(pathOrNodes)
+function path:__init(pathOrNodes)
     if not pathOrNodes then
         self.m_nodes = {}
         return
@@ -38,7 +38,7 @@ function Path:__init(pathOrNodes)
 
     if type(pathOrNodes) == "string" then
         pathOrNodes = formatStr(pathOrNodes)
-        pathOrNodes = String.Split(pathOrNodes, "/")
+        pathOrNodes = utils_string.split(pathOrNodes, "/")
     end
 
     local length = #pathOrNodes
@@ -49,40 +49,40 @@ function Path:__init(pathOrNodes)
 
     self.m_nodes = pathOrNodes
 
-    self:Normalize()
+    self:normalize()
 end
 
 ---@return string path
-function Path:ToString()
-    return String.Join(self.m_nodes, "/")
+function path:to_string()
+    return utils_string.join(self.m_nodes, "/")
 end
 
 ---@private
-Path.__tostring = Path.ToString
+path.__tostring = path.to_string
 
 ---@return boolean
-function Path:IsEmpty()
+function path:empty()
     return #self.m_nodes == 0 or (#self.m_nodes == 2 and self.m_nodes[1] == "" and self.m_nodes[2] == "")
 end
 
 ---@return boolean
-function Path:IsFile()
+function path:file()
     return self.m_nodes[#self.m_nodes] ~= ""
 end
 
 ---@return boolean
-function Path:IsDir()
+function path:dir()
     return self.m_nodes[#self.m_nodes] == ""
 end
 
-function Path:Exists()
-    local path = self:ToString()
-    return lfs.attributes(path) ~= nil
+function path:exists()
+    local path_str = self:to_string()
+    return lfs.attributes(path_str) ~= nil
 end
 
 ---@return string
-function Path:GetParentFolder()
-    local copy = Table.Copy(self.m_nodes)
+function path:get_parent_folder()
+    local copy = utils_table.copy(self.m_nodes)
     local length = #copy
 
     if length > 0 then
@@ -94,12 +94,12 @@ function Path:GetParentFolder()
         end
     end
 
-    return String.Join(copy, "/")
+    return utils_string.join(copy, "/")
 end
 
----@return lua-cmake.FileSystem.Path
-function Path:GetParentFolderPath()
-    local copy = self:Copy()
+---@return lua-cmake.filesystem.path
+function path:get_parent_folder_path()
+    local copy = self:copy()
     local length = #copy.m_nodes
 
     if length > 0 then
@@ -115,18 +115,18 @@ function Path:GetParentFolderPath()
 end
 
 ---@return string fileName
-function Path:GetFileName()
-    if not self:IsFile() then
-        error("path is not a file: " .. self:ToString())
+function path:get_file_name()
+    if not self:file() then
+        error("path is not a file: " .. self:to_string())
     end
 
     return self.m_nodes[#self.m_nodes]
 end
 
 ---@return string fileExtension
-function Path:GetFileExtension()
-    if not self:IsFile() then
-        error("path is not a file: " .. self:ToString())
+function path:get_file_extension()
+    if not self:file() then
+        error("path is not a file: " .. self:to_string())
     end
 
     local fileName = self.m_nodes[#self.m_nodes]
@@ -136,9 +136,9 @@ function Path:GetFileExtension()
 end
 
 ---@return string fileStem
-function Path:GetFileStem()
-    if not self:IsFile() then
-        error("path is not a file: " .. self:ToString())
+function path:get_file_stem()
+    if not self:file() then
+        error("path is not a file: " .. self:to_string())
     end
 
     local fileName = self.m_nodes[#self.m_nodes]
@@ -147,8 +147,8 @@ function Path:GetFileStem()
     return stem
 end
 
----@return lua-cmake.FileSystem.Path
-function Path:Normalize()
+---@return lua-cmake.filesystem.path
+function path:normalize()
     ---@type string[]
     local newNodes = {}
 
@@ -171,32 +171,32 @@ function Path:Normalize()
     return self
 end
 
----@param path string
----@return lua-cmake.FileSystem.Path
-function Path:Append(path)
-    path = formatStr(path)
-    local newNodes = String.Split(path, "/")
+---@param path_str string
+---@return lua-cmake.filesystem.path
+function path:append(path_str)
+    path_str = formatStr(path_str)
+    local newNodes = utils_string.split(path_str, "/")
 
     for _, value in ipairs(newNodes) do
         self.m_nodes[#self.m_nodes + 1] = value
     end
 
-    self:Normalize()
+    self:normalize()
 
     return self
 end
 
----@param path string
----@return lua-cmake.FileSystem.Path
-function Path:Extend(path)
-    local copy = self:Copy()
-    return copy:Append(path)
+---@param path_str string
+---@return lua-cmake.filesystem.path
+function path:extend(path_str)
+    local copy = self:copy()
+    return copy:append(path_str)
 end
 
----@return lua-cmake.FileSystem.Path
-function Path:Copy()
-    local copyNodes = Table.Copy(self.m_nodes)
-    return Path(copyNodes)
+---@return lua-cmake.filesystem.path
+function path:copy()
+    local copyNodes = utils_table.copy(self.m_nodes)
+    return path(copyNodes)
 end
 
-return class("lua-cmake.FileSystem.Path", Path)
+return class("lua-cmake.FileSystem.Path", path)

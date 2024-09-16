@@ -1,19 +1,19 @@
----@class lua-cmake.Utils.Table
-local Table = {}
+---@class lua-cmake.utils.table
+local table = {}
 
 ---@param obj table?
 ---@param seen table[]
 ---@return table?
-local function copyTable(obj, copy, seen)
+local function copy_table(obj, copy, seen)
     if obj == nil then return nil end
     if seen[obj] then return seen[obj] end
 
     seen[obj] = copy
-    setmetatable(copy, copyTable(getmetatable(obj), {}, seen))
+    setmetatable(copy, copy_table(getmetatable(obj), {}, seen))
 
     for key, value in next, obj, nil do
-        key = (type(key) == "table") and copyTable(key, {}, seen) or key
-        value = (type(value) == "table") and copyTable(value, {}, seen) or value
+        key = (type(key) == "table") and copy_table(key, {}, seen) or key
+        value = (type(value) == "table") and copy_table(value, {}, seen) or value
         rawset(copy, key, value)
     end
 
@@ -23,24 +23,24 @@ end
 ---@generic TTable
 ---@param t TTable
 ---@return TTable table
-function Table.Copy(t)
-    return copyTable(t, {}, {})
+function table.copy(t)
+    return copy_table(t, {}, {})
 end
 
 ---@param from table
 ---@param to table
-function Table.CopyTo(from, to)
-    copyTable(from, to, {})
+function table.copyTo(from, to)
+    copy_table(from, to, {})
 end
 
 ---@param t table
 ---@param ignoreProperties string[]?
-function Table.Clear(t, ignoreProperties)
+function table.clear(t, ignoreProperties)
     if not ignoreProperties then
         ignoreProperties = {}
     end
     for key, _ in next, t, nil do
-        if not Table.Contains(ignoreProperties, key) then
+        if not table.Contains(ignoreProperties, key) then
             t[key] = nil
         end
     end
@@ -50,7 +50,7 @@ end
 ---@param t table
 ---@param value any
 ---@return boolean
-function Table.Contains(t, value)
+function table.Contains(t, value)
     for _, tValue in pairs(t) do
         if value == tValue then
             return true
@@ -62,7 +62,7 @@ end
 ---@param t table
 ---@param key any
 ---@return boolean
-function Table.ContainsKey(t, key)
+function table.contains_key(t, key)
     if t[key] ~= nil then
         return true
     end
@@ -71,7 +71,7 @@ end
 
 --- removes all spaces between
 ---@param t any[]
-function Table.Clean(t)
+function table.clean(t)
     for key, value in pairs(t) do
         for i = key - 1, 1, -1 do
             if key ~= 1 then
@@ -87,7 +87,7 @@ end
 
 ---@param t table
 ---@return integer count
-function Table.Count(t)
+function table.count(t)
     local count = 0
     for _, _ in next, t, nil do
         count = count + 1
@@ -97,7 +97,7 @@ end
 
 ---@param t table
 ---@return table
-function Table.Invert(t)
+function table.invert(t)
     local inverted = {}
     for key, value in pairs(t) do
         inverted[value] = key
@@ -109,7 +109,7 @@ end
 ---@param t T[]
 ---@param func fun(x: T) : boolean
 ---@return boolean
-function Table.Any(t, func)
+function table.any(t, func)
     for _, value in pairs(t) do
         if func(value) then
             return true
@@ -118,4 +118,4 @@ function Table.Any(t, func)
     return false
 end
 
-return Table
+return table

@@ -1,10 +1,10 @@
----@class lua-cmake.Utils.String
-local String = {}
+---@class lua-cmake.utils.string
+local string = {}
 
 ---@param str string
 ---@param pattern string
 ---@return string?, integer
-local function findNext(str, pattern)
+local function find_next(str, pattern)
     local found = str:find(pattern, 0, true)
     if found == nil then
         return nil, 0
@@ -15,7 +15,7 @@ end
 ---@param str string?
 ---@param sep string?
 ---@return string[]
-function String.Split(str, sep)
+function string.split(str, sep)
     if str == nil then
         return {}
     end
@@ -34,7 +34,7 @@ function String.Split(str, sep)
     local i = 0
     while true do
         i = i + 1
-        local foundStr, foundPos = findNext(str, sep)
+        local foundStr, foundPos = find_next(str, sep)
 
         if foundStr == nil then
             tbl[i] = str
@@ -48,7 +48,7 @@ end
 
 ---@param str string?
 ---@return boolean
-function String.IsNilOrEmpty(str)
+function string.nil_or_empty(str)
     if str == nil then
         return true
     end
@@ -61,7 +61,7 @@ end
 ---@param array string[]
 ---@param sep string
 ---@return string
-function String.Join(array, sep)
+function string.join(array, sep)
     local str = ""
 
     str = array[1]
@@ -72,4 +72,4 @@ function String.Join(array, sep)
     return str
 end
 
-return String
+return string
