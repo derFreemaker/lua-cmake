@@ -1,5 +1,5 @@
 # lua-cmake
-Lua wrapper for cmake.
+CMake generator in lua.
 
 ## Get Started
 1. Clone the repo
