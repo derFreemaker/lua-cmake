@@ -2,7 +2,7 @@
 ---@field m_cmake_version string
 ---@field m_registry lua-cmake.registry
 local CMake = {
-    m_registry = require("lua-cmake.cmake.registry")
+    m_registry = require("lua-cmake.cmake.registry"),
 }
 
 ---@param version string?

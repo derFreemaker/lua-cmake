@@ -7,7 +7,9 @@ CMake generator in lua.
 3. Set `LUA_CMAKE_DIR` to `{your_repo_path}`
 
 ## Usage
-Add a `cmake.lua` in your repo root and everything can be configured over the `CMake` global.
+Add a `luacmake.lua` in your repo root and everything can be configured over `require("cmake")`.
+
+For command options use `lua-cmake -h`.
 
 ## Goal
 The goal is to make writing complex system in cmake easier by making you able to configure in lua.

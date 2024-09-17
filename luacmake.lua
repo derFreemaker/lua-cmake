@@ -1,10 +1,10 @@
 -- test file
-
-CMake:cmake_version("3.28")
-
+local cmake = require("cmake")
 local exe = require("lua-cmake.targets.cxx.executable")
 
-exe({
+cmake:cmake_version("3.28")
+
+exe {
     name = "test",
     srcs = {
         "test.cpp"
@@ -12,4 +12,4 @@ exe({
     hdrs = {
         "test.h"
     }
-})
+}

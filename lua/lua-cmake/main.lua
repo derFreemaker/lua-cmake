@@ -1,4 +1,5 @@
 -- Function to detect the operating system
+---@return "windows" | "linux"
 local function get_os()
     if package.config:sub(1, 1) == '\\' then
         return "windows"
@@ -6,6 +7,7 @@ local function get_os()
         return "linux"
     end
 end
+
 -- Function to set the correct library path based on OS
 local function setup_path()
     local os_name = get_os()
@@ -45,60 +47,69 @@ require("lua-cmake.third_party.derFreemaker.ClassSystem")
 
 local cli_parser = require("lua-cmake.third_party.other.cli_parser")
 local parser = cli_parser("lua-cmake", "Used to generate cmake files configured from lua.")
-parser:argument("entry", "The entry file for lua-cmake.", "cmake.lua")
+parser:argument("config", "The config file for lua-cmake.", "luacmake.lua")
 parser:option("-o --output", "The output file path in which the generate cmake gets written to.", "CMakeLists.txt")
 
----@type { entry: string }
+---@type { config: string }
 local args = parser:parse()
 
 --//TODO: add version flag
 
-local full_entry_path = lfs.currentdir() .. "/" .. args.entry
-if lfs.attributes(full_entry_path) == nil then
-    error("Entry file not found: " .. full_entry_path)
+-- load and run entry lau file
+local config_path
+if get_os() == "windows" then
+    config_path = lfs.currentdir() .. "\\" .. args.config
+else
+    config_path = lfs.currentdir() .. "/" .. args.config
 end
-print("lua-cmake: entry file: " .. full_entry_path)
+
+if lfs.attributes(config_path) == nil then
+    error("config file not found: " .. config_path)
+end
+print("lua-cmake: config file '" .. config_path .. "'")
 
 local registry = require("lua-cmake.cmake.registry")
-CMake = require("lua-cmake.cmake.cmake")
+local cmake = require("cmake")
 
 do
-    local time_start = os.clock()
+    local stopwatch = require("lua-cmake.utils.stopwatch")()
+    stopwatch:start()
 
-    -- load and run entry lau file
-    local entry_path = lfs.currentdir() .. "/" .. args.entry
-    local entry_func, entry_err_msg = loadfile(entry_path, "t")
-    if not entry_func then
-        error("unable to load entry file: '" .. entry_path .. "' \nerror:\n  " .. entry_err_msg)
+    local config_func, config_err_msg = loadfile(config_path, "t")
+    if not config_func then
+        error("unable to load entry file: '" .. config_path .. "' \nerror:\n  " .. config_err_msg)
     end
-    local entry_success
-    entry_success, entry_err_msg = pcall(entry_func)
-    if not entry_success then
-        error("lua-cmake: entry file: error while executing: " .. entry_err_msg)
-    end
-
-    local time_end = os.clock()
-    ---@type integer | string
-    local time_diff = math.floor((time_end - time_start) * 10) / 10
-    if time_diff < 0.1 then
-        time_diff = "<0.1"
+    local config_thread = coroutine.create(config_func)
+    local config_success
+    config_success, config_err_msg = coroutine.resume(config_thread)
+    if not config_success then
+        print("error in config file: " .. config_err_msg .. "\n" .. debug.traceback(config_thread))
+        os.exit(-1)
     end
 
-    print("lua-cmake: configured (" .. time_diff .. "s)")
+    stopwatch:stop()
+    ---@type number | string
+    local time = math.floor(stopwatch:get_time_milliseconds() / 10) / 10
+    if time < 0.1 then
+        time = "<0.1"
+    end
+
+    print("lua-cmake: configured (" .. time .. "s)")
 end
 
 -- checking
 if not registry:check() then
     return
 end
-if not CMake:cmake_version() then
+if not cmake:cmake_version() then
     error("A cmake version is required to be set! CMake:cmake_version({version})")
 end
 
 --//TODO: move this some where else
 
 do
-    local time_start = os.clock()
+    local stopwatch = require("lua-cmake.utils.stopwatch")()
+    stopwatch:start()
 
     -- generating
     local target_cmake_lines = {}
@@ -111,17 +122,16 @@ do
     if not cmake_file then
         error("unable to open 'CMakeLists.txt' file: " .. lfs.currentdir() .. "/CMakeLists.txt")
     end
-    cmake_file:write("cmake_minimum_required(VERSION " .. CMake:cmake_version() .. ")\n")
+    cmake_file:write("cmake_minimum_required(VERSION " .. cmake:cmake_version() .. ")\n")
     cmake_file:write(require("lua-cmake.utils.string").join(target_cmake_lines, "\n"))
     cmake_file:close()
 
-    local time_end = os.clock()
-
-    ---@type integer | string
-    local time_diff = math.floor((time_end - time_start) * 10) / 10
-    if time_diff < 0.1 then
-        time_diff = "<0.1"
+    stopwatch:stop()
+    ---@type number | string
+    local time = math.floor(stopwatch:get_time_milliseconds() / 10) / 10
+    if time < 0.1 then
+        time = "<0.1"
     end
 
-    print("lua-cmake: generated (" .. time_diff .. "s)")
+    print("lua-cmake: generated (" .. time .. "s)")
 end
