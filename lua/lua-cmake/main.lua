@@ -69,7 +69,8 @@ end
 print("lua-cmake: config file '" .. config_path .. "'")
 
 local registry = require("lua-cmake.cmake.registry")
-local cmake = require("cmake")
+---@type lua-cmake.cmake
+cmake = require("lua-cmake.cmake.cmake")
 
 do
     local stopwatch = require("lua-cmake.utils.stopwatch")()
@@ -101,8 +102,8 @@ end
 if not registry:check() then
     return
 end
-if not cmake:cmake_version() then
-    error("A cmake version is required to be set! CMake:cmake_version({version})")
+if not cmake.cmake_minimum_required() then
+    error("A cmake version is required to be set! cmake.cmake_minimum_required({version})")
 end
 
 --//TODO: move this some where else
@@ -122,7 +123,7 @@ do
     if not cmake_file then
         error("unable to open 'CMakeLists.txt' file: " .. lfs.currentdir() .. "/CMakeLists.txt")
     end
-    cmake_file:write("cmake_minimum_required(VERSION " .. cmake:cmake_version() .. ")\n")
+    cmake_file:write("cmake_minimum_required(VERSION " .. cmake.cmake_minimum_required() .. ")\n")
     cmake_file:write(require("lua-cmake.utils.string").join(target_cmake_lines, "\n"))
     cmake_file:close()
 

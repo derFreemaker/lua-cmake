@@ -1,8 +1,7 @@
 -- test file
-local cmake = require("cmake")
-local exe = require("lua-cmake.targets.cxx.executable")
+local exe = require("targets.cxx.executable")
 
-cmake:cmake_version("3.28")
+cmake.cmake_minimum_required("3.28")
 
 exe {
     name = "test",
