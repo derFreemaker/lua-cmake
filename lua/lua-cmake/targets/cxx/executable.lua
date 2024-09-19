@@ -1,4 +1,3 @@
-local registry = require("lua-cmake.cmake.registry")
 local utils_string = require("lua-cmake.utils.string")
 
 ---@class lua-cmake.target.cxx.executable.config : object, lua-cmake.target
@@ -18,8 +17,6 @@ local executable = {}
 ---@param config lua-cmake.target.cxx.executable.config
 function executable:__init(config)
     self.config = config
-
-    registry:add_target(self)
 end
 
 --------------------------------

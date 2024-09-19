@@ -1,5 +1,3 @@
-local registry = require("lua-cmake.cmake.registry")
-
 ---@class lua-cmake.target.cxx.library.config : object, lua-cmake.target
 ---@field name string
 ---@field srcs string[] | nil
@@ -18,8 +16,6 @@ local library = {}
 ---@param config lua-cmake.target.cxx.library.config
 function library:__init(config)
     self.config = config
-
-    registry:add_target(self)
 end
 
 --------------------------------

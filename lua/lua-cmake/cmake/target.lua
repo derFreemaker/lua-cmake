@@ -18,9 +18,4 @@ target.get_kind = ClassSystem.IsInterface
 function target:get_deps() end
 target.get_deps = ClassSystem.IsInterface
 
----@return string
----@diagnostic disable-next-line: missing-return
-function target:generate_cmake() end
-target.generate_cmake = ClassSystem.IsInterface
-
-return interface("lua-cmake.target", target)
+return interface("lua-cmake.cmake.target", target)

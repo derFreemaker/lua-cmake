@@ -50,27 +50,20 @@ local parser = cli_parser("lua-cmake", "Used to generate cmake files configured 
 parser:argument("config", "The config file for lua-cmake.", "luacmake.lua")
 parser:option("-o --output", "The output file path in which the generate cmake gets written to.", "CMakeLists.txt")
 
----@type { config: string }
+---@type { config: string, output: string }
 local args = parser:parse()
 
 --//TODO: add version flag
 
 -- load and run entry lau file
-local config_path
-if get_os() == "windows" then
-    config_path = lfs.currentdir() .. "\\" .. args.config
-else
-    config_path = lfs.currentdir() .. "/" .. args.config
-end
+local config_path = lfs.currentdir():gsub("\\", "/") .. "/" .. args.config
 
 if lfs.attributes(config_path) == nil then
     error("config file not found: " .. config_path)
 end
 print("lua-cmake: config file '" .. config_path .. "'")
 
-local registry = require("lua-cmake.cmake.registry")
----@type lua-cmake.cmake
-cmake = require("lua-cmake.cmake.cmake")
+require("lua-cmake.cmake.cmake")
 
 do
     local stopwatch = require("lua-cmake.utils.stopwatch")()
@@ -98,36 +91,27 @@ do
     print("lua-cmake: configured (" .. time .. "s)")
 end
 
--- checking
-if not registry:check() then
-    return
-end
-if not cmake.cmake_minimum_required() then
+if not cmake.get_cmake_minimum_required() then
     error("A cmake version is required to be set! cmake.cmake_minimum_required({version})")
 end
 
 --//TODO: move this some where else
 
 do
+    local cmake_file = io.open(lfs.currentdir() .. "/" .. args.output, "w+")
+    if not cmake_file then
+        error("unable to open output file: " .. lfs.currentdir() .. "/" .. args.output)
+    end
+    local generator = require("lua-cmake.gen.generator")
+
     local stopwatch = require("lua-cmake.utils.stopwatch")()
     stopwatch:start()
 
-    -- generating
-    local target_cmake_lines = {}
-    for _, target in pairs(registry:get_targets_inorder()) do
-        table.insert(target_cmake_lines, target:generate_cmake() .. "\n")
-    end
-
-    -- writing
-    local cmake_file = io.open(lfs.currentdir() .. "/CMakeLists.txt", "w+")
-    if not cmake_file then
-        error("unable to open 'CMakeLists.txt' file: " .. lfs.currentdir() .. "/CMakeLists.txt")
-    end
-    cmake_file:write("cmake_minimum_required(VERSION " .. cmake.cmake_minimum_required() .. ")\n")
-    cmake_file:write(require("lua-cmake.utils.string").join(target_cmake_lines, "\n"))
-    cmake_file:close()
+    cmake_file:write(generator:generate())
 
     stopwatch:stop()
+    cmake_file:close()
+
     ---@type number | string
     local time = math.floor(stopwatch:get_time_milliseconds() / 10) / 10
     if time < 0.1 then

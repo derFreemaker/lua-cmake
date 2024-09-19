@@ -40,7 +40,7 @@ function table.clear(t, ignoreProperties)
         ignoreProperties = {}
     end
     for key, _ in next, t, nil do
-        if not table.Contains(ignoreProperties, key) then
+        if not table.contains(ignoreProperties, key) then
             t[key] = nil
         end
     end
@@ -50,7 +50,7 @@ end
 ---@param t table
 ---@param value any
 ---@return boolean
-function table.Contains(t, value)
+function table.contains(t, value)
     for _, tValue in pairs(t) do
         if value == tValue then
             return true
@@ -107,7 +107,7 @@ end
 
 ---@generic T
 ---@param t T[]
----@param func fun(x: T) : boolean
+---@param func fun(value: T) : boolean
 ---@return boolean
 function table.any(t, func)
     for _, value in pairs(t) do
@@ -116,6 +116,19 @@ function table.any(t, func)
         end
     end
     return false
+end
+
+---@generic T
+---@generic R
+---@param t T[]
+---@param func fun(value: T) : R
+---@return R[] 
+function table.map(t, func)
+    local result = {}
+    for index, value in ipairs(t) do
+        result[index] = func(value)
+    end
+    return result
 end
 
 return table
