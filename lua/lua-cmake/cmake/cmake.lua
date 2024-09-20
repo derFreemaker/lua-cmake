@@ -5,12 +5,13 @@ local utils_table = require("lua-cmake.utils.table")
 local generator = require("lua-cmake.gen.generator")
 
 ---@class lua-cmake.cmake
----@field m_min_cmake_version integer[] | nil
----@field m_max_cmake_version integer[] | nil
-cmake = {}
+---@field private m_min_cmake_version integer[] | nil
+---@field private m_max_cmake_version integer[] | nil
+local cmake = {}
+_G.cmake = cmake
 
 ---@return string | nil
-function cmake.get_cmake_minimum_required()
+function cmake.get_version()
     if not cmake.m_min_cmake_version then
         return nil
     end
@@ -31,7 +32,7 @@ function cmake.get_cmake_minimum_required()
 end
 
 ---@param version string
-function cmake.cmake_minimum_required(version)
+function cmake.version(version)
     local splited_version = utils_string.split(version, "...")
     local min_version = utils_table.map(utils_string.split(splited_version[1], "."),
         function(value)
@@ -97,11 +98,13 @@ function cmake.cmake_minimum_required(version)
 end
 
 generator:add_action({
-    name = "cmake-version",
-    version = cmake.get_cmake_minimum_required(),
-    func = function(self)
-        return "cmake_minimum_required(VERSION " .. self.version .. " FATAL_ERROR)"
-    end
+    kind = "cmake-version",
+    func = function(context)
+        return "cmake_minimum_required(VERSION " .. context.get_version() .. " FATAL_ERROR)"
+    end,
+    context = {
+        get_version = cmake.get_version,
+    },
 })
 
 ---@param variable string
@@ -114,11 +117,13 @@ function cmake.set(variable, value)
     end
 
     generator:add_action({
-        name = "set",
-        variable = variable,
-        value = value,
-        func = function(self)
-            return "set(" .. self.variable .. " " .. self.value .. ")"
+        kind = "set",
+        func = function(context)
+            return "set(" .. context.variable .. " " .. context.value .. ")"
         end,
+        context = {
+            variable = variable,
+            value = value,
+        }
     })
 end

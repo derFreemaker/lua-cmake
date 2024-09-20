@@ -91,7 +91,7 @@ do
     print("lua-cmake: configured (" .. time .. "s)")
 end
 
-if not cmake.get_cmake_minimum_required() then
+if not cmake.get_version() then
     error("A cmake version is required to be set! cmake.cmake_minimum_required({version})")
 end
 
