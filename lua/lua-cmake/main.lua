@@ -1,4 +1,3 @@
--- Function to detect the operating system
 ---@return "windows" | "linux"
 local function get_os()
     if package.config:sub(1, 1) == '\\' then
@@ -8,7 +7,28 @@ local function get_os()
     end
 end
 
--- Function to set the correct library path based on OS
+local function make_path_absolute(path, relative)
+    local new_path
+
+    if get_os() == "windows" then
+        local str = path:sub(2, 2)
+        if str == ":" then
+            new_path = path
+        else
+            new_path = relative .. "/" .. path
+        end
+        new_path = new_path:gsub("\\", "/")
+    else
+        if path:sub(1, 1) == "/" then
+            new_path = path
+        else
+            new_path = relative .. "/" .. path
+        end
+    end
+
+    return new_path
+end
+
 local function setup_path()
     local os_name = get_os()
 
@@ -55,13 +75,14 @@ local args = parser:parse()
 
 --//TODO: add version flag
 
--- load and run entry lau file
-local config_path = lfs.currentdir():gsub("\\", "/") .. "/" .. args.config
+local current_dir = lfs.currentdir()
+args.config = make_path_absolute(args.config, current_dir)
+args.output = make_path_absolute(args.output, current_dir)
 
-if lfs.exists(config_path) then
-    error("config file not found: " .. config_path)
+if lfs.exists(args.config) then
+    error("config file not found: " .. args.config)
 end
-print("lua-cmake: config file '" .. config_path .. "'")
+print("lua-cmake: config file '" .. args.config .. "'")
 
 require("lua-cmake.cmake.cmake")
 
@@ -69,9 +90,9 @@ do
     local stopwatch = require("lua-cmake.utils.stopwatch")()
     stopwatch:start()
 
-    local config_func, config_err_msg = loadfile(config_path, "t")
+    local config_func, config_err_msg = loadfile(args.config, "t")
     if not config_func then
-        error("unable to load entry file: '" .. config_path .. "' \nerror:\n  " .. config_err_msg)
+        error("unable to load entry file: '" .. args.config .. "' \nerror:\n  " .. config_err_msg)
     end
     local config_thread = coroutine.create(config_func)
     local config_success
@@ -98,9 +119,9 @@ end
 --//TODO: move this some where else
 
 do
-    local cmake_file = io.open(lfs.currentdir() .. "/" .. args.output, "w+")
+    local cmake_file = io.open(args.output, "w+")
     if not cmake_file then
-        error("unable to open output file: " .. lfs.currentdir() .. "/" .. args.output)
+        error("unable to open output file: " .. args.output)
     end
     local generator = require("lua-cmake.gen.generator")
 

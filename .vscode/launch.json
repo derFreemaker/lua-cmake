@@ -8,7 +8,11 @@
             "type": "lua",
             "request": "launch",
             "name": "Debug lua-cmake",
-            "program": "${workspaceFolder}/lua/lua-cmake/main.lua"
+            "program": "${workspaceFolder}/lua/lua-cmake/main.lua",
+            "arg": [
+                "${workspaceFolder}/test/test.lua",
+                "--output", "test/CMakeLists.txt"
+            ]
         }
     ]
 }
