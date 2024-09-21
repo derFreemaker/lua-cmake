@@ -58,7 +58,7 @@ local args = parser:parse()
 -- load and run entry lau file
 local config_path = lfs.currentdir():gsub("\\", "/") .. "/" .. args.config
 
-if lfs.attributes(config_path) == nil then
+if lfs.exists(config_path) then
     error("config file not found: " .. config_path)
 end
 print("lua-cmake: config file '" .. config_path .. "'")

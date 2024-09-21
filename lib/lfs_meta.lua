@@ -1,5 +1,4 @@
 ---@meta
----@diagnostic disable: missing-return
 
 ---@class lfs
 lfs = {}
@@ -41,6 +40,10 @@ function lfs.attributes(path, request_name) end
 ---@param path string
 ---@param result_table table
 function lfs.attributes(path, result_table) end
+
+---@param path string
+---@return boolean
+function lfs.exists(path) end
 
 --- Changes the current working directory to the given path.
 --- Returns true in case of success or nil plus an error string.
