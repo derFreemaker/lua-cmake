@@ -1,4 +1,3 @@
-local generator = require("lua-cmake.gen.generator")
 local utils_string = require("lua-cmake.utils.string")
 local utils_table = require("lua-cmake.utils.table")
 
@@ -26,33 +25,27 @@ function library:__init(config)
 
     self.config = config
 
-    generator:add_action({
+    cmake.generator.add_action({
         kind = "lua-cmake.cxx.library",
-        ---@param context lua-cmake.target.cxx.library
-        func = function(context)
-            local str = "add_library("
-            str = str .. context.config.name .. " "
+        ---@param context lua-cmake.target.cxx.library.config
+        func = function(builder, context)
+            builder:append_line("add_library(", context.name)
 
-            if context.config.type then
-                str = str .. context.config.type:upper() .. " "
+            if context.type then
+                builder:append_line("    ", context.type:upper())
             end
 
-            if context.config.exclude_from_all then
-                str = str .. "EXCLUDE_FROM_ALL "
+            if context.exclude_from_all then
+                builder:append_line("    EXCLUDE_FROM_ALL")
             end
 
-            str = str .. utils_string.join(
-                utils_table.map(context.config.srcs, function(value)
-                    return "\"" .. value .. "\""
-                end),
-                " ")
-            str = str .. ")"
+            for _, value in ipairs(context.srcs) do
+                builder:append_line("    ", "\"", value, "\"")
+            end
 
-            return str
+            builder:append_line(")")
         end,
-        context = {
-            config = self.config
-        }
+        context = self.config
     })
 end
 

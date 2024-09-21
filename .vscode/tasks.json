@@ -10,6 +10,17 @@
                 "test/test.lua",
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "Run lua-cmake without optimizer",
+            "type": "shell",
+            "command": "lua-cmake",
+            "args": [
+                "--no-optimize",
+                "--output", "test/CMakeLists.txt",
+                "test/test.lua",
+            ],
+            "problemMatcher": []
         }
     ]
 }

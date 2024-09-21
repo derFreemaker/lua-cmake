@@ -1,31 +1,41 @@
 local utils_string = require("lua-cmake.utils.string")
+local string_builder = require("lua-cmake.utils.string_builder")
 
 ---@class lua-cmake.gen.context
 
 ---@class lua-cmake.gen.action
 ---@field kind string
----@field func fun(context: table) : string
+---@field func fun(writer: lua-cmake.utils.string_builder, context: table)
 ---@field context table | nil
 
----@class lua-cmake.gen
----@field m_actions lua-cmake.gen.action[]
-local gen = {
-    m_actions = {}
+---@class lua-cmake.gen.generator
+---@field optimizer lua-cmake.perf.optimizer
+---@field private m_actions lua-cmake.gen.action[]
+local generator = {
+    optimizer = require("lua-cmake.perf.optimizer"),
+    m_actions = {},
 }
 
 ---@param action lua-cmake.gen.action
-function gen:add_action(action)
-    table.insert(self.m_actions, action)
+function generator.add_action(action)
+    table.insert(generator.m_actions, action)
 end
 
+---@private
 ---@return string
-function gen:generate()
-    local action_results = {}
-    for _, action in ipairs(self.m_actions) do
-        local result = action.func(action.context or {})
-        table.insert(action_results, result)
+function generator.generate()
+    local builder = string_builder()
+    for _, action in ipairs(generator.m_actions) do
+        action.func(builder, action.context or {})
+        builder:append_line()
     end
-    return utils_string.join(action_results, "\n")
+    return builder:build()
 end
 
-return gen
+---@private
+function generator.optimize()
+    ---@diagnostic disable-next-line: invisible
+    generator.optimizer.optimize(generator.m_actions)
+end
+
+return generator

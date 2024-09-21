@@ -13,6 +13,17 @@
                 "${workspaceFolder}/test/test.lua",
                 "--output", "test/CMakeLists.txt"
             ]
+        },
+        {
+            "type": "lua",
+            "request": "launch",
+            "name": "Debug lua-cmake without optimize",
+            "program": "${workspaceFolder}/lua/lua-cmake/main.lua",
+            "arg": [
+                "--no-optimize",
+                "--output", "test/CMakeLists.txt",
+                "${workspaceFolder}/test/test.lua",
+            ]
         }
     ]
 }

@@ -18,3 +18,7 @@ The way it works is it generates a cmake file based on the configuration, this m
 ## Builtin Systems
 - For filesystem interactions [LuaFileSystem](https://lunarmodules.github.io/luafilesystem) (with some small additions) is comming with it and can be required directly like so `require("lfs")`.
 - In order to over engineer this a [ClassSystem](https://github.com/derFreemaker/Lua-Class-System) is builtin with the two gobal functions `class`, `interface` and can be require like so `require("lua-cmake.third_party.derFreemaker.ClassSystem")`.
+
+## Third-Party
+- [argparse](https://github.com/mpeterv/argparse)
+- [LuaFileSystem](https://lunarmodules.github.io/luafilesystem)

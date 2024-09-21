@@ -1,13 +1,15 @@
 local utils_string = require("lua-cmake.utils.string")
 local utils_table = require("lua-cmake.utils.table")
-
-
-local generator = require("lua-cmake.gen.generator")
+local string_builder = require("lua-cmake.utils.string_builder")
 
 ---@class lua-cmake.cmake
+---@field generator lua-cmake.gen.generator
+---
 ---@field private m_min_cmake_version integer[] | nil
 ---@field private m_max_cmake_version integer[] | nil
-local cmake = {}
+local cmake = {
+    generator = require("lua-cmake.gen.generator"),
+}
 _G.cmake = cmake
 
 ---@return string | nil
@@ -15,20 +17,21 @@ function cmake.get_version()
     if not cmake.m_min_cmake_version then
         return nil
     end
+    local builder = string_builder()
 
     local min_cmake_version_str = utils_table.map(cmake.m_min_cmake_version, function(value)
         return tostring(value)
     end)
-    local str = utils_string.join(min_cmake_version_str, ".")
+    builder:append(table.concat(min_cmake_version_str, "."))
 
     if cmake.m_max_cmake_version then
         local max_cmake_version_str = utils_table.map(cmake.m_max_cmake_version, function(value)
             return tostring(value)
         end)
-        str = str .. "..." .. utils_string.join(max_cmake_version_str, ".")
+        builder:append("...", table.concat(max_cmake_version_str, "."))
     end
 
-    return str
+    return builder:build()
 end
 
 ---@param version string
@@ -91,16 +94,16 @@ function cmake.version(version)
         end
 
         if min_bigger_than_max then
-            error(
-                "Minimum cmake version can not be bigger than maximum cmake version. Check your cmake version configurations!")
+            error("Minimum cmake version can not be bigger than maximum cmake version."
+                .. " Check your cmake version configurations!")
         end
     end
 end
 
-generator:add_action({
+cmake.generator.add_action({
     kind = "cmake-version",
-    func = function(context)
-        return "cmake_minimum_required(VERSION " .. context.get_version() .. " FATAL_ERROR)"
+    func = function(builder, context)
+        builder:append_line("cmake_minimum_required(VERSION ", context.get_version(), " FATAL_ERROR)")
     end,
     context = {
         get_version = cmake.get_version,
@@ -109,21 +112,51 @@ generator:add_action({
 
 ---@param variable string
 ---@param value string | boolean
-function cmake.set(variable, value)
+---@param parent_scope boolean | nil
+function cmake.set(variable, value, parent_scope)
     if value == true then
         value = "TRUE"
     elseif value == false then
         value = "FALSE"
     end
 
-    generator:add_action({
-        kind = "set",
-        func = function(context)
-            return "set(" .. context.variable .. " " .. context.value .. ")"
+    cmake.generator.add_action({
+        kind = "cmake-set",
+        func = function(builder, context)
+            builder:append("set(", context.variable, " ", context.value)
+            if context.parent_scope then
+                builder:append(" PARENT_SCOPE")
+            end
+            builder:append_line(")")
         end,
         context = {
             variable = variable,
             value = value,
+            parent_scope = parent_scope or false
         }
     })
 end
+
+cmake.generator.optimizer.add_strat("cmake-set", function(iter)
+    ---@type table<string, integer>
+    local t = {}
+
+    while iter:current() do
+        local current = iter:current()
+
+        local key = current.context.variable .. "_parent_scope-" .. tostring(current.context.parent_scope)
+        local index = t[key]
+        if index ~= nil then
+            iter:pop(index)
+        end
+
+        t[key] = iter:index()
+
+        if not iter:next_is_same() then
+            iter:increment()
+            return
+        end
+
+        iter:increment()
+    end
+end)

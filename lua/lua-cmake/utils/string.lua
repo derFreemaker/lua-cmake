@@ -58,18 +58,4 @@ function string.nil_or_empty(str)
     return false
 end
 
----@param array string[]
----@param sep string
----@return string
-function string.join(array, sep)
-    local str = ""
-
-    str = array[1]
-    for _, value in next, array, 1 do
-        str = str .. sep .. value
-    end
-
-    return str
-end
-
 return string

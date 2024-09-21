@@ -69,8 +69,9 @@ local cli_parser = require("lua-cmake.third_party.other.cli_parser")
 local parser = cli_parser("lua-cmake", "Used to generate cmake files configured from lua.")
 parser:argument("config", "The config file for lua-cmake.", "luacmake.lua")
 parser:option("-o --output", "The output file path in which the generate cmake gets written to.", "CMakeLists.txt")
+parser:flag("-p --no-optimize", "Sets the optimizer should NOT be run. (Disabling can improve stability)")
 
----@type { config: string, output: string }
+---@type { config: string, output: string, no_optimize: boolean }
 local args = parser:parse()
 
 --//TODO: add version flag
@@ -84,60 +85,66 @@ if lfs.exists(args.config) then
 end
 print("lua-cmake: config file '" .. args.config .. "'")
 
+local stopwatch = require("lua-cmake.utils.stopwatch")
+local sw_total = stopwatch()
+sw_total:start()
+
 require("lua-cmake.cmake.cmake")
 
 do
-    local stopwatch = require("lua-cmake.utils.stopwatch")()
-    stopwatch:start()
-
     local config_func, config_err_msg = loadfile(args.config, "t")
     if not config_func then
         error("unable to load entry file: '" .. args.config .. "' \nerror:\n  " .. config_err_msg)
     end
     local config_thread = coroutine.create(config_func)
     local config_success
+
+    local sw = stopwatch()
+    sw:start()
+
     config_success, config_err_msg = coroutine.resume(config_thread)
     if not config_success then
         print("error in config file: " .. config_err_msg .. "\n" .. debug.traceback(config_thread))
         os.exit(-1)
     end
 
-    stopwatch:stop()
-    ---@type number | string
-    local time = math.floor(stopwatch:get_time_milliseconds() / 10) / 10
-    if time < 0.1 then
-        time = "<0.1"
-    end
-
-    print("lua-cmake: configured (" .. time .. "s)")
+    sw:stop()
+    print("lua-cmake: configured (" .. sw:get_pretty_seconds() .. "s)")
 end
 
 if not cmake.get_version() then
-    error("A cmake version is required to be set! cmake.cmake_minimum_required({version})")
+    error("A cmake version is required to be set! cmake.version(...)")
 end
 
---//TODO: move this some where else
+if not args.no_optimize then
+    local sw = stopwatch()
+    sw:start()
+
+    ---@diagnostic disable-next-line: invisible
+    cmake.generator.optimize()
+
+    sw:stop()
+    print("lua-cmake: optimized (" .. sw:get_pretty_seconds() .. "s)")
+else
+    print("lua-cmake: optimizer disabled")
+end
 
 do
+    local sw = stopwatch()
+    sw:start()
+
     local cmake_file = io.open(args.output, "w+")
     if not cmake_file then
         error("unable to open output file: " .. args.output)
     end
-    local generator = require("lua-cmake.gen.generator")
 
-    local stopwatch = require("lua-cmake.utils.stopwatch")()
-    stopwatch:start()
-
-    cmake_file:write(generator:generate())
-
-    stopwatch:stop()
+    ---@diagnostic disable-next-line: invisible
+    cmake_file:write(cmake.generator:generate())
     cmake_file:close()
 
-    ---@type number | string
-    local time = math.floor(stopwatch:get_time_milliseconds() / 10) / 10
-    if time < 0.1 then
-        time = "<0.1"
-    end
-
-    print("lua-cmake: generated (" .. time .. "s)")
+    sw:stop()
+    print("lua-cmake: generated (" .. sw:get_pretty_seconds() .. "s)")
 end
+
+sw_total:stop()
+print("lua-cmake: total (" .. sw_total:get_pretty_seconds() .. "s)")

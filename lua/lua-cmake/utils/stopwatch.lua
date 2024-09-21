@@ -29,14 +29,31 @@ function stopwatch:get_time_seconds()
     return self:get_diff()
 end
 
+---@return string
+function stopwatch:get_pretty_seconds()
+    ---@type number | string
+    local time = math.floor(self:get_time_milliseconds() / 10) / 10
+    if time < 0.1 then
+        return "<0.1"
+    end
+
+    return tostring(time)
+end
+
 ---@return number
 function stopwatch:get_time_milliseconds()
     return self:get_diff() * 1000
 end
 
----@return number
-function stopwatch:get_time_microseconds()
-    return self:get_diff() * 1000000
+---@return string
+function stopwatch:get_pretty_milliseconds()
+    ---@type number | string
+    local time = math.floor(self:get_time_milliseconds() * 10) / 10
+    if time < 0.1 then
+        return "<0.1"
+    end
+
+    return tostring(time)
 end
 
 return class("lua-cmake.utils.stopwatch", stopwatch)

@@ -16,9 +16,10 @@ exe {
 
 lib {
     name = "test2",
-    srcs = {
-        "test.cpp"
-    },
     type = "static",
-    exclude_from_all = true
+    exclude_from_all = true,
+    srcs = {
+        "test.cpp",
+        "test2.cpp"
+    },
 }

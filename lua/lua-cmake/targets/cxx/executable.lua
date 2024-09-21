@@ -17,6 +17,13 @@ local executable = {}
 ---@param config lua-cmake.target.cxx.executable.config
 function executable:__init(config)
     self.config = config
+
+    -- cmake.generator.add_action({
+    --     kind = "lua-cmake.cxx.executable",
+    --     func = function(context)
+    --         local str = 
+    --     end
+    -- })
 end
 
 --------------------------------
@@ -36,23 +43,6 @@ end
 ---@return string[]
 function executable:get_deps()
     return self.config.deps or {}
-end
-
----@return string
-function executable:generate_cmake()
-    local str = "add_executable(" .. self.config.name
-
-    if type(self.config.hdrs) == "table" then
-        str = str .. " " .. utils_string.join(self.config.hdrs, " ")
-    end
-
-    if type(self.config.srcs) == "table" then
-        str = str .. " " .. utils_string.join(self.config.srcs, " ")
-    end
-
-    str = str .. ")"
-
-    return str
 end
 
 return class("lua-cmake.target.cxx.executable", executable, { Inherit = require("lua-cmake.cmake.target") })
