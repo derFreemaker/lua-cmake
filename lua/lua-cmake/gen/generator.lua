@@ -4,7 +4,7 @@ local utils_string = require("lua-cmake.utils.string")
 
 ---@class lua-cmake.gen.action
 ---@field kind string
----@field func fun(self: table) : string
+---@field func fun(context: table) : string
 ---@field context table | nil
 
 ---@class lua-cmake.gen

@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run lua-cmake",
+            "type": "shell",
+            "command": "lua-cmake",
+            "args": [
+                "--output", "test/CMakeLists.txt",
+                "test/test.lua",
+            ],
+            "problemMatcher": []
+        }
+    ]
+}
