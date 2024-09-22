@@ -1,5 +1,9 @@
 {
     "Lua.diagnostics.globals": [
         "cmake"
+    ],
+    "Lua.workspace.ignoreDir": [
+        ".vscode",
+        "**/third_party/derFreemaker/utils/src/**/*.lua"
     ]
 }

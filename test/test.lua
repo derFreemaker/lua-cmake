@@ -23,3 +23,9 @@ lib {
         "test2.cpp"
     },
 }
+
+cmake.set("test", "asd")
+cmake.set("test2", "asdasd")
+cmake.set("test2", "asdasdasd")
+cmake.set("test", "asdasdasasd")
+cmake.set("test", "asd")

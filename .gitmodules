@@ -1,0 +1,3 @@
+[submodule "lua/lua-cmake/third_party/derFreemaker/utils"]
+	path = lua/lua-cmake/third_party/derFreemaker/utils
+	url = https://github.com/derFreemaker/Freemaker.Lua

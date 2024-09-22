@@ -1,6 +1,3 @@
-local utils_string = require("lua-cmake.utils.string")
-local utils_table = require("lua-cmake.utils.table")
-
 ---@class lua-cmake.target.cxx.library.config : object
 ---@field name string
 ---@field srcs string[] | nil
@@ -9,7 +6,7 @@ local utils_table = require("lua-cmake.utils.table")
 ---@field type "static" | "shared" | "module" | nil
 ---@field exclude_from_all boolean | nil
 
----@class lua-cmake.target.cxx.library : object, lua-cmake.target
+---@class lua-cmake.target.cxx.library : object
 ---@field config lua-cmake.target.cxx.library.config
 ---@overload fun(config: lua-cmake.target.cxx.library.config) : lua-cmake.target.cxx.library
 local library = {}
@@ -49,23 +46,4 @@ function library:__init(config)
     })
 end
 
---------------------------------
--- lua-cmake.target
---------------------------------
-
----@return string
-function library:get_name()
-    return self.config.name
-end
-
----@return string
-function library:get_kind()
-    return "lua-cmake.cxx.library"
-end
-
----@return string[]
-function library:get_deps()
-    return self.config.deps
-end
-
-return class("lua-cmake.target.cxx.library", library, { Inherit = require("lua-cmake.cmake.target") })
+return class("lua-cmake.target.cxx.library", library)

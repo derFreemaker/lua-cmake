@@ -1,4 +1,3 @@
-local utils_string = require("lua-cmake.utils.string")
 local string_builder = require("lua-cmake.utils.string_builder")
 
 ---@class lua-cmake.gen.context
@@ -27,7 +26,6 @@ function generator.generate()
     local builder = string_builder()
     for _, action in ipairs(generator.m_actions) do
         action.func(builder, action.context or {})
-        builder:append_line()
     end
     return builder:build()
 end

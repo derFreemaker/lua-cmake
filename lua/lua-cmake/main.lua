@@ -63,7 +63,7 @@ local lfs_status, lfs = pcall(require, "lfs")
 if not lfs_status then
     error("Failed to load LuaFileSystem library: " .. lfs)
 end
-require("lua-cmake.third_party.derFreemaker.ClassSystem")
+require("lua-cmake.third_party.derFreemaker.class_system")
 
 local cli_parser = require("lua-cmake.third_party.other.cli_parser")
 local parser = cli_parser("lua-cmake", "Used to generate cmake files configured from lua.")
@@ -80,7 +80,7 @@ local current_dir = lfs.currentdir()
 args.config = make_path_absolute(args.config, current_dir)
 args.output = make_path_absolute(args.output, current_dir)
 
-if lfs.exists(args.config) then
+if not lfs.exists(args.config) then
     error("config file not found: " .. args.config)
 end
 print("lua-cmake: config file '" .. args.config .. "'")

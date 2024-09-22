@@ -1,5 +1,4 @@
-local utils_string = require("lua-cmake.utils.string")
-local utils_table = require("lua-cmake.utils.table")
+local utils = require("lua-cmake.third_party.derFreemaker.utils.bin.utils")
 local string_builder = require("lua-cmake.utils.string_builder")
 
 ---@class lua-cmake.cmake
@@ -19,16 +18,18 @@ function cmake.get_version()
     end
     local builder = string_builder()
 
-    local min_cmake_version_str = utils_table.map(cmake.m_min_cmake_version, function(value)
-        return tostring(value)
-    end)
-    builder:append(table.concat(min_cmake_version_str, "."))
+    -- local min_cmake_version_str = utils.table.map(cmake.m_min_cmake_version, function(value)
+    --     return tostring(value)
+    -- end)
+    -- builder:append(table.concat(min_cmake_version_str, "."))
+    builder:append(table.concat(cmake.m_min_cmake_version, "."))
 
     if cmake.m_max_cmake_version then
-        local max_cmake_version_str = utils_table.map(cmake.m_max_cmake_version, function(value)
-            return tostring(value)
-        end)
-        builder:append("...", table.concat(max_cmake_version_str, "."))
+        -- local max_cmake_version_str = utils.table.map(cmake.m_max_cmake_version, function(value)
+        --     return tostring(value)
+        -- end)
+        -- builder:append("...", table.concat(max_cmake_version_str, "."))
+        builder:append("...", table.concat(cmake.m_max_cmake_version, "."))
     end
 
     return builder:build()
@@ -36,12 +37,12 @@ end
 
 ---@param version string
 function cmake.version(version)
-    local splited_version = utils_string.split(version, "...")
-    local min_version = utils_table.map(utils_string.split(splited_version[1], "."),
+    local splited_version = utils.string.split(version, "...")
+    local min_version = utils.table.map(utils.string.split(splited_version[1], "."),
         function(value)
             return tonumber(value)
         end)
-    local max_version = utils_table.map(utils_string.split(splited_version[2], "."),
+    local max_version = utils.table.map(utils.string.split(splited_version[2], "."),
         function(value)
             return tonumber(value)
         end)
@@ -144,7 +145,7 @@ cmake.generator.optimizer.add_strat("cmake-set", function(iter)
     while iter:current() do
         local current = iter:current()
 
-        local key = current.context.variable .. "_parent_scope-" .. tostring(current.context.parent_scope)
+        local key = current.context.variable .. "_parent-scope:" .. tostring(current.context.parent_scope)
         local index = t[key]
         if index ~= nil then
             iter:pop(index)
@@ -153,7 +154,6 @@ cmake.generator.optimizer.add_strat("cmake-set", function(iter)
         t[key] = iter:index()
 
         if not iter:next_is_same() then
-            iter:increment()
             return
         end
 

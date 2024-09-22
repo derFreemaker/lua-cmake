@@ -8,23 +8,23 @@ function string_builder:__init()
     self.m_buffer = {}
 end
 
----@param ... string
+---@param ... any
 ---@return lua-cmake.utils.string_builder
 function string_builder:append(...)
     local args = {...}
-    for _, str in ipairs(args) do
-        table.insert(self.m_buffer, str)
+    for _, value in ipairs(args) do
+        table.insert(self.m_buffer, tostring(value))
     end
 
     return self
 end
 
----@param ... string
+---@param ... any
 ---@return lua-cmake.utils.string_builder
 function string_builder:append_line(...)
     local args = {...}
-    for _, str in ipairs(args) do
-        table.insert(self.m_buffer, str)
+    for _, value in ipairs(args) do
+        table.insert(self.m_buffer, tostring(value))
     end
     table.insert(self.m_buffer, "\n")
 
