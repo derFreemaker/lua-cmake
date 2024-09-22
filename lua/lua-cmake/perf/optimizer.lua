@@ -1,6 +1,6 @@
 local iterator = require("lua-cmake.perf.iterator")
 
----@alias lua-cmake.perf.strategy fun(iter: lua-cmake.perf.actions_iterator, value: lua-cmake.gen.action) | fun(iter: lua-cmake.perf.actions_iterator)
+---@alias lua-cmake.perf.strategy fun(iter: lua-cmake.perf.actions_iterator, value: lua-cmake.gen.action)
 
 ---@class lua-cmake.perf.optimizer
 ---@field private m_strategies table<string, lua-cmake.perf.strategy[]>
@@ -28,11 +28,12 @@ function optimizer.run_strategies(iter, kind, strategies)
     for _, strat in ipairs(strategies) do
         while true do
             strat(iter, iter:current())
-            iter:increment()
 
-            if not iter:current() or iter:current().kind ~= kind then
+            if not iter:next_is_same() then
+                iter:increment()
                 return
             end
+            iter:increment()
         end
     end
 end
@@ -42,8 +43,7 @@ end
 function optimizer.optimize(actions)
     local iter = iterator(actions)
 
-    local actions_count = #actions
-    while iter:index() < actions_count do
+    while not iter:empty() do
         local kind = actions[iter:index()].kind
         local kind_strategies = optimizer.m_strategies[kind]
         if not kind_strategies then

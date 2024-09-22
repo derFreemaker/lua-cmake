@@ -4,7 +4,7 @@ local string_builder = require("lua-cmake.utils.string_builder")
 
 ---@class lua-cmake.gen.action
 ---@field kind string
----@field func fun(writer: lua-cmake.utils.string_builder, context: table)
+---@field func fun(builder: lua-cmake.utils.string_builder, context: table)
 ---@field context table | nil
 
 ---@class lua-cmake.gen.generator

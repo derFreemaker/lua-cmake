@@ -124,7 +124,7 @@ function cmake.set(variable, value, parent_scope)
     cmake.generator.add_action({
         kind = "cmake-set",
         func = function(builder, context)
-            builder:append("set(", context.variable, " ", context.value)
+            builder:append("set(", context.variable, " \"", context.value, "\"")
             if context.parent_scope then
                 builder:append(" PARENT_SCOPE")
             end
@@ -145,10 +145,10 @@ cmake.generator.optimizer.add_strat("cmake-set", function(iter)
     while iter:current() do
         local current = iter:current()
 
-        local key = current.context.variable .. "_parent-scope:" .. tostring(current.context.parent_scope)
+        local key = current.context.variable .. tostring(current.context.parent_scope)
         local index = t[key]
         if index ~= nil then
-            iter:pop(index)
+            iter:remove(index)
         end
 
         t[key] = iter:index()
@@ -158,5 +158,110 @@ cmake.generator.optimizer.add_strat("cmake-set", function(iter)
         end
 
         iter:increment()
+    end
+end)
+
+---@type table<string, true>
+local includes = {}
+---@param include string
+---@param optional boolean | nil
+---@param result_var string | nil
+---@param no_policy_scope boolean | nil
+function cmake.include(include, optional, result_var, no_policy_scope)
+    cmake.generator.add_action({
+        kind = "cmake-include",
+        func = function(builder, context)
+            builder:append("include(\"", context.include, "\"")
+
+            if context.optional then
+                builder:append(" OPTIONAL")
+            end
+
+            if context.result_var then
+                builder:append(" ", context.result_var)
+            end
+
+            if context.no_policy_scope then
+                builder:append(" NO_POLICY_SCOPE")
+            end
+
+            builder:append_line(")")
+        end,
+        context = {
+            include = include,
+            optional = optional,
+            result_var = result_var,
+            no_policy_scope = no_policy_scope,
+
+            includes = includes
+        }
+    })
+end
+
+cmake.generator.optimizer.add_strat("cmake-include", function(iter)
+    ---@type table
+    local context = iter:current().context
+    local key = context.include ..
+        tostring(context.optional) .. tostring(context.result_var) .. tostring(context.no_policy_scope)
+    if context.includes[key] then
+        iter:remove_current()
+    end
+
+    context.includes[key] = true
+end)
+
+---@type table<string, true>
+local include_directories = {}
+---@param ... string
+function cmake.include_directories(...)
+    if #({ ... }) == 0 then
+        return
+    end
+
+    cmake.generator.add_action({
+        kind = "cmake-include_directories",
+        func = function(builder, context)
+            builder:append_line("include_directories(")
+            for _, dir in ipairs(context.dirs) do
+                builder:append_line("    \"", dir, "\"")
+            end
+            builder:append_line(")")
+        end,
+        context = {
+            dirs = { ... },
+
+            include_directories = include_directories
+        }
+    })
+end
+
+cmake.generator.optimizer.add_strat("cmake-include_directories", function(iter, value)
+    local changed = false
+
+    for index, dir in ipairs(value.context.dirs) do
+        if value.context.include_directories[dir] then
+            value.context.dirs[index] = nil
+            changed = true
+            goto continue
+        end
+
+        value.context.include_directories[dir] = true
+        ::continue::
+    end
+
+    if not changed then
+        return
+    end
+
+    if #value.context.dirs == 0 then
+        iter:remove_current()
+        return
+    end
+
+    local i = 1
+    for index, dir in pairs(value.context.dirs) do
+        value.context.dirs[index] = nil
+        value.context.dirs[i] = dir
+        i = i + 1
     end
 end)

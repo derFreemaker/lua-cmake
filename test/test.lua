@@ -38,8 +38,18 @@ lib {
     },
 }
 
+cmake.include_directories("test", "test2")
+
+cmake.include("test")
+
 cmake.set("test", "asd")
 cmake.set("test2", "asdasd")
 cmake.set("test2", "asdasdasd")
 cmake.set("test", "asdasdasasd")
 cmake.set("test", "asd")
+
+cmake.include("test")
+cmake.include("test23")
+cmake.include("test23")
+
+cmake.include_directories("test2", "test")
