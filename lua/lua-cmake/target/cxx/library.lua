@@ -16,14 +16,10 @@ local library = {}
 ---@private
 ---@param config lua-cmake.target.cxx.library.config
 function library:__init(config)
-    if config.type ~= "static" and config.type ~= "shared" and config.type ~= "module" then
-        error("unsupported library type: " .. config.type)
-    end
-
     self.config = config
 
     cmake.generator.add_action({
-        kind = "lua-cmake.cxx.library",
+        kind = "lua-cmake.target.cxx.library",
         ---@param context lua-cmake.target.cxx.library.config
         func = function(builder, context)
             builder:append_line("add_library(", context.name)
