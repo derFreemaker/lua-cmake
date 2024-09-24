@@ -1,5 +1,6 @@
----@class lua-cmake.target.cxx.executable.config : object
----@field name string
+local add_target_options = require("lua-cmake.target.target_options")
+
+---@class lua-cmake.target.cxx.executable.config : lua-cmake.target.config
 ---@field srcs string[] | nil
 ---@field hdrs string[] | nil
 ---@field deps string[] | nil
@@ -45,6 +46,8 @@ function executable:__init(config)
         end,
         context = self.config
     })
+
+    add_target_options(self.config)
 end
 
 return class("lua-cmake.target.cxx.executable", executable)
