@@ -51,5 +51,3 @@ cmake.set("test", "asd")
 cmake.include("test")
 cmake.include("test23")
 cmake.include("test23")
-
-cmake.include_directories("test2", "test")
