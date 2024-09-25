@@ -1,6 +1,5 @@
-local add_target_options = require("lua-cmake.target.target_options")
-
----@class lua-cmake.target.cxx.library.config : lua-cmake.target.config
+---@class lua-cmake.target.cxx.library.config
+---@field name string
 ---@field srcs string[] | nil
 ---@field hdrs string[] | nil
 ---@field deps string[] | nil
@@ -41,8 +40,6 @@ function library:__init(config)
         end,
         context = self.config
     })
-
-    add_target_options(self.config)
 end
 
 return class("lua-cmake.target.cxx.library", library)
