@@ -214,13 +214,14 @@ end)
 local include_directories = {}
 ---@param ... string
 function cmake.include_directories(...)
-    if #({ ... }) == 0 then
+    local dirs = {...}
+    if #dirs == 0 then
         return
     end
 
     cmake.generator.add_action({
         kind = "cmake-include_directories",
-        func = function(builder, context)
+        func = function (builder, context)
             builder:append_line("include_directories(")
             for _, dir in ipairs(context.dirs) do
                 builder:append_line("    \"", dir, "\"")
@@ -228,7 +229,7 @@ function cmake.include_directories(...)
             builder:append_line(")")
         end,
         context = {
-            dirs = { ... },
+            dirs = dirs,
 
             include_directories = include_directories
         }
