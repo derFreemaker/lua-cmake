@@ -1,42 +1,6 @@
 ---@class lua-cmake.target_options
 local target_options = {}
 
----@class lua-cmake.target.options.compile_definition
----@field items { name: string, value: string | nil }[]
----@field type "interface" | "private" | "public"
-
----@param target lua-cmake.reference<string>
----@param compile_definitions lua-cmake.target.options.compile_definition[]
-function target_options.add_target_compile_definitions(target, compile_definitions)
-    cmake.generator.add_action({
-        kind = "cmake-target_compile_definitions",
-        ---@param context { target: lua-cmake.reference<string>, definitions: lua-cmake.target.options.compile_definition[] }
-        func = function(builder, context)
-            if #context.definitions == 0 then
-                return
-            end
-
-            builder:append_line("target_compile_definitions(", context.target:get())
-
-            for _, definition in ipairs(context.definitions) do
-                builder:append_line("    ", definition.type:upper())
-                for _, item in pairs(definition.items) do
-                    builder:append("        ", item.name)
-                    if item.value ~= nil then
-                        builder:append("=", item.value)
-                    end
-                    builder:append_line()
-                end
-            end
-            builder:append_line(")")
-        end,
-        context = {
-            target = target,
-            definitions = compile_definitions
-        }
-    })
-end
-
 ---@class lua-cmake.target.options.compile_feature
 ---@field name string
 ---@field type "interface" | "private" | "public"
@@ -281,7 +245,6 @@ end
 ---@param target lua-cmake.reference<string>
 ---@param options lua-cmake.target.options
 function target_options.add_all_options(target, options)
-    target_options.add_target_compile_definitions(target, options.compile_definitions)
     target_options.add_target_compile_features(target, options.compile_features)
     target_options.add_target_compile_options(target, options.compile_options)
     target_options.add_target_include_directories(target, options.include_directories)

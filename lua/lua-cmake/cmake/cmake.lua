@@ -266,3 +266,39 @@ cmake.generator.optimizer.add_strat("cmake-include_directories", function(iter, 
         i = i + 1
     end
 end)
+
+---@class lua-cmake.target.options.compile_definition
+---@field items { name: string, value: string | nil }[]
+---@field type "interface" | "private" | "public"
+
+---@param target string
+---@param compile_definitions lua-cmake.target.options.compile_definition[]
+function cmake.target_compile_definitions(target, compile_definitions)
+    cmake.generator.add_action({
+        kind = "cmake-target_compile_definitions",
+        ---@param context { target: string, definitions: lua-cmake.target.options.compile_definition[] }
+        func = function(builder, context)
+            if #context.definitions == 0 then
+                return
+            end
+
+            builder:append_line("target_compile_definitions(", context.target)
+
+            for _, definition in ipairs(context.definitions) do
+                builder:append_line("    ", definition.type:upper())
+                for _, item in pairs(definition.items) do
+                    builder:append("        ", item.name)
+                    if item.value ~= nil then
+                        builder:append("=", item.value)
+                    end
+                    builder:append_line()
+                end
+            end
+            builder:append_line(")")
+        end,
+        context = {
+            target = target,
+            definitions = compile_definitions
+        }
+    })
+end
