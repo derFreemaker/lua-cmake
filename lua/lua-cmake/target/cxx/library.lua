@@ -1,3 +1,5 @@
+local target_options = require("lua-cmake.target.options")
+
 ---@class lua-cmake.target.cxx.library.config
 ---@field name string
 ---@field srcs string[] | nil
@@ -5,6 +7,7 @@
 ---@field deps string[] | nil
 ---@field type "static" | "shared" | "module" | nil
 ---@field exclude_from_all boolean | nil
+---@field options lua-cmake.target.options | nil
 
 ---@class lua-cmake.target.cxx.library : object
 ---@field config lua-cmake.target.cxx.library.config
@@ -23,20 +26,26 @@ function library:__init(config)
         ---@param context lua-cmake.target.cxx.library.config
         func = function(builder, context)
             builder:append_line("add_library(", context.name)
-
             if context.type then
-                builder:append_line("    ", context.type:upper())
+                builder
+                    :append_indent()
+                    :append_line(context.type:upper())
             end
 
             if context.exclude_from_all then
-                builder:append_line("    EXCLUDE_FROM_ALL")
+                builder
+                    :append_indent()
+                    :append_line("EXCLUDE_FROM_ALL")
             end
 
             for _, value in ipairs(context.srcs) do
-                builder:append_line("    ", "\"", value, "\"")
+                builder
+                    :append_indent()
+                    :append_line("\"", value, "\"")
             end
-
             builder:append_line(")")
+
+            target_options(builder, context.name, context.options)
         end,
         context = self.config
     })

@@ -11,7 +11,7 @@ end
 ---@param ... any
 ---@return lua-cmake.utils.string_builder
 function string_builder:append(...)
-    local args = {...}
+    local args = { ... }
     for _, value in ipairs(args) do
         table.insert(self.m_buffer, tostring(value))
     end
@@ -22,11 +22,22 @@ end
 ---@param ... any
 ---@return lua-cmake.utils.string_builder
 function string_builder:append_line(...)
-    local args = {...}
+    local args = { ... }
     for _, value in ipairs(args) do
         table.insert(self.m_buffer, tostring(value))
     end
     table.insert(self.m_buffer, "\n")
+
+    return self
+end
+
+---@param indent integer | nil
+function string_builder:append_indent(indent)
+    indent = indent or 1
+
+    for i = 0, indent, 1 do
+        table.insert(self.m_buffer, "    ")
+    end
 
     return self
 end

@@ -14,7 +14,7 @@ imported_exe {
 
 imported_lib {
     name = "test_lib_imported",
-    type = "unknown",
+    type = "static",
     global = true
 }
 
@@ -25,6 +25,27 @@ exe {
     },
     hdrs = {
         "test.h"
+    },
+    options = {
+        compile_definitions = {
+            {
+                type = "private",
+                items = {
+                    {
+                        "asd",
+                    }
+                }
+            }
+        },
+        compile_features = {
+            {
+                name = "asd",
+                type = "private",
+            }
+        },
+        compile_options = {
+            before = true
+        }
     }
 }
 
