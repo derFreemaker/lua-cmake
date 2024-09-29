@@ -18,14 +18,14 @@ function library:__init(config)
     cmake.generator.add_action({
         kind = "lua-cmake.target.imported.library",
         ---@param context lua-cmake.target.imported.library.config
-        func = function(builder, context)
-            builder:append("add_library(", context.name, " ", context.type:upper(), " IMPORTED")
+        func = function(writer, context)
+            writer:write("add_library(", context.name, " ", context.type:upper(), " IMPORTED")
 
             if context.global then
-                builder:append(" GLOBAL")
+                writer:write(" GLOBAL")
             end
 
-            builder:append_line(")")
+            writer:write_line(")")
         end,
         context = self.config
     })

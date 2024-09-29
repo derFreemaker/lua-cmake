@@ -17,43 +17,51 @@ function project:__init(config)
         kind = "lua-cmake.cmake.project",
         ---@param context lua-cmake.cmake.project.config
         func = function(writer, context)
-            writer:append("project(", context.name)
+            writer:write("project(", context.name)
 
             local details = false
             if context.version then
                 details = true
 
-                writer:append("\n    VERSION ", context.version.major)
-                writer:append(".", context.version.minor or 0)
-                writer:append(".", context.version.patch or 0)
-                writer:append(".", context.version.tweak or 0)
+                writer
+                    :write_line()
+                    :write("    VERSION ", context.version.major)
+                    :write(".", context.version.minor or 0)
+                    :write(".", context.version.patch or 0)
+                    :write(".", context.version.tweak or 0)
             end
 
             if context.description then
                 details = true
 
-                writer:append("\n    DESCRIPTION \"", context.description, "\"")
+                writer
+                    :write_line()
+                    :write("    DESCRIPTION \"", context.description, "\"")
             end
 
             if context.homepage_url then
                 details = true
 
-                writer:append("\n    HOMEPAGE_URL \"", context.homepage_url, "\"")
+                writer
+                    :write_line()
+                    :write("    HOMEPAGE_URL \"", context.homepage_url, "\"")
             end
 
             if context.languages then
                 details = true
 
-                writer:append("\n    LANGUAGES")
+                writer
+                    :write_line()
+                    :write("    LANGUAGES")
                 for _, lang in ipairs(context.languages) do
-                    writer:append(" ", lang)
+                    writer:write(" ", lang)
                 end
             end
 
             if details then
-                writer:append_line()
+                writer:write_line()
             end
-            writer:append_line(")")
+            writer:write_line(")")
         end,
         context = self.config
     })

@@ -17,14 +17,14 @@ function executable:__init(config)
     cmake.generator.add_action({
         kind = "lua-cmake.target.imported.executable",
         ---@param context lua-cmake.target.imported.executable.config
-        func = function(builder, context)
-            builder:append("add_executable(", context.name, " IMPORTED")
+        func = function(write, context)
+            write:write("add_executable(", context.name, " IMPORTED")
 
             if context.global then
-                builder:append(" GLOBAL")
+                write:write(" GLOBAL")
             end
 
-            builder:append_line(")")
+            write:write_line(")")
         end,
         context = self.config
     })

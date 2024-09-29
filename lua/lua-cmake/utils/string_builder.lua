@@ -33,9 +33,17 @@ end
 
 ---@param indent integer | nil
 function string_builder:append_indent(indent)
+    if not indent then
+        return self:append("    ")
+    end
+
+    if indent == 0 then
+        return self
+    end
+
     indent = indent or 1
 
-    for i = 0, indent, 1 do
+    for _ = 1, indent, 1 do
         table.insert(self.m_buffer, "    ")
     end
 

@@ -32,19 +32,24 @@ exe {
                 type = "private",
                 items = {
                     {
-                        "asd",
+                        "Name",
+                        "Test"
                     }
                 }
             }
         },
         compile_features = {
             {
-                name = "asd",
                 type = "private",
+                "compile_feature",
             }
         },
         compile_options = {
-            before = true
+            before = true,
+            {
+                type = "public",
+                "test",
+            }
         }
     }
 }
@@ -63,12 +68,9 @@ cmake.include_directories("test", "test2")
 
 cmake.include("test")
 
-cmake.set("test", "asd")
-cmake.set("test2", "asdasd")
-cmake.set("test2", "asdasdasd")
-cmake.set("test", "asdasdasasd")
-cmake.set("test", "asd")
+cmake.add_definition("test", "etset")
+cmake.add_definition("testasd", "etsetasd")
 
-cmake.include("test")
-cmake.include("test23")
-cmake.include("test23")
+cmake._if("${CMAKE_BUILD_TYPE} STREQUAL \"Debug\"", function()
+    cmake.set("Test", "Test")
+end)

@@ -25,36 +25,36 @@ function executable:__init(config)
     cmake.generator.add_action({
         kind = "lua-cmake.target.cxx.executable",
         ---@param context lua-cmake.target.cxx.executable.config
-        func = function(builder, context)
-            builder:append_line("add_executable(", context.name)
+        func = function(writer, context)
+            writer:write_line("add_executable(", context.name)
 
             if context.win32 then
-                builder
-                    :append_indent()
-                    :append_line("WIN32_EXECUTABLE")
+                writer
+                    :write_indent()
+                    :write_line("WIN32_EXECUTABLE")
             end
 
             if context.macosx_bundle then
-                builder
-                    :append_indent()
-                    :append_line("MACOSX_BUNDLE")
+                writer
+                    :write_indent()
+                    :write_line("MACOSX_BUNDLE")
             end
 
             if context.exclude_from_all then
-                builder
-                    :append_indent()
-                    :append_line("EXCLUDE_FROM_ALL")
+                writer
+                    :write_indent()
+                    :write_line("EXCLUDE_FROM_ALL")
             end
 
             for _, src in ipairs(context.srcs) do
-                builder
-                    :append_indent()
-                    :append_line("\"", src, "\"")
+                writer
+                    :write_indent()
+                    :write_line("\"", src, "\"")
             end
 
-            builder:append_line(")")
+            writer:write_line(")")
 
-            target_options(builder, context.name, context.options)
+            target_options(writer, context.name, context.options)
         end,
         context = self.config
     })

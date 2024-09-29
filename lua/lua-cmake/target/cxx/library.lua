@@ -24,28 +24,28 @@ function library:__init(config)
     cmake.generator.add_action({
         kind = "lua-cmake.target.cxx.library",
         ---@param context lua-cmake.target.cxx.library.config
-        func = function(builder, context)
-            builder:append_line("add_library(", context.name)
+        func = function(writer, context)
+            writer:write_line("add_library(", context.name)
             if context.type then
-                builder
-                    :append_indent()
-                    :append_line(context.type:upper())
+                writer
+                    :write_indent()
+                    :write_line(context.type:upper())
             end
 
             if context.exclude_from_all then
-                builder
-                    :append_indent()
-                    :append_line("EXCLUDE_FROM_ALL")
+                writer
+                    :write_indent()
+                    :write_line("EXCLUDE_FROM_ALL")
             end
 
             for _, value in ipairs(context.srcs) do
-                builder
-                    :append_indent()
-                    :append_line("\"", value, "\"")
+                writer
+                    :write_indent()
+                    :write_line("\"", value, "\"")
             end
-            builder:append_line(")")
+            writer:write_line(")")
 
-            target_options(builder, context.name, context.options)
+            target_options(writer, context.name, context.options)
         end,
         context = self.config
     })

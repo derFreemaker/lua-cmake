@@ -7,6 +7,9 @@ local function get_os()
     end
 end
 
+---@param path string
+---@param relative string
+---@return string
 local function make_path_absolute(path, relative)
     local new_path
 
@@ -71,14 +74,27 @@ parser:argument("config", "The config file for lua-cmake.", "luacmake.lua")
 parser:option("-o --output", "The output file path in which the generate cmake gets written to.", "CMakeLists.txt")
 parser:flag("-p --no-optimize", "Sets the optimizer should NOT be run. (Disabling can improve stability)")
 
----@type { config: string, output: string, no_optimize: boolean }
+---@type { config: string, output: string | nil, no_optimize: boolean }
 local args = parser:parse()
 
 --//TODO: add version flag
 
-local current_dir = lfs.currentdir()
-args.config = make_path_absolute(args.config, current_dir)
-args.output = make_path_absolute(args.output, current_dir)
+do
+    local current_dir = lfs.currentdir()
+    if not current_dir then
+        error("unable to get current directory")
+    end
+
+    args.config = make_path_absolute(args.config, current_dir)
+    args.output = make_path_absolute(args.output, current_dir)
+
+    do
+        local reverse = args.config:reverse()
+        local pos = reverse:find("/", reverse:find("/", nil, true), true)
+        local parent_folder = args.config:sub(0, reverse:len() - pos)
+        lfs.chdir(parent_folder)
+    end
+end
 
 if not lfs.exists(args.config) then
     error("config file not found: " .. args.config)
@@ -138,8 +154,16 @@ do
         error("unable to open output file: " .. args.output)
     end
 
+    ---@param ... string
+    local function write(...)
+        cmake_file:write(...)
+    end
+
+    local writer = require("lua-cmake.utils.string_writer")(write)
+
     ---@diagnostic disable-next-line: invisible
-    cmake_file:write(cmake.generator:generate())
+    cmake.generator.generate(writer)
+
     cmake_file:close()
 
     sw:stop()

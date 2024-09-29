@@ -1,13 +1,13 @@
 ---@class lua-cmake.perf.actions_iterator : object
 ---@field private m_index integer
 ---@field private m_end integer
----@field private m_current lua-cmake.gen.action
----@field private m_actions lua-cmake.gen.action[]
----@overload fun(actions: lua-cmake.gen.action[]) : lua-cmake.perf.actions_iterator
+---@field private m_current lua-cmake.gen.action<any>
+---@field private m_actions lua-cmake.gen.action<any>[]
+---@overload fun(actions: lua-cmake.gen.action<any>[]) : lua-cmake.perf.actions_iterator
 local iterator = {}
 
 ---@private
----@param actions lua-cmake.gen.action[]
+---@param actions lua-cmake.gen.action<any>[]
 function iterator:__init(actions)
     self.m_index = 1
     self.m_actions = actions
@@ -25,12 +25,18 @@ function iterator:index()
     return self.m_index
 end
 
----@return lua-cmake.gen.action
+---@param index integer
+function iterator:set_index(index)
+    self.m_index = index - 1
+    self:increment()
+end
+
+---@return lua-cmake.gen.action<any>
 function iterator:current()
     return self.m_current
 end
 
----@return lua-cmake.gen.action
+---@return lua-cmake.gen.action<any>
 function iterator:next()
     return self.m_actions[self.m_index + 1]
 end
