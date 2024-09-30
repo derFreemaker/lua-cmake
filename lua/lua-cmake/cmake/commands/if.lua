@@ -2,7 +2,7 @@
 local cmake = _G.cmake
 
 ---@param condition string
----@param body fun() | nil
+---@param body fun()
 ---@return lua-cmake.if.elses
 function cmake._if(condition, body)
     cmake.generator.add_action({
@@ -34,7 +34,7 @@ function cmake._if(condition, body)
     local elses = {}
 
     ---@param elseif_condition string
-    ---@param elseif_body fun() | nil
+    ---@param elseif_body fun()
     function elses._elseif(elseif_condition, elseif_body)
         cmake.generator.remove_last_action()
         cmake.generator.add_action({
@@ -59,7 +59,7 @@ function cmake._if(condition, body)
         return elses
     end
 
-    ---@param else_body fun() | nil
+    ---@param else_body fun()
     function elses._else(else_body)
         cmake.generator.remove_last_action()
         cmake.generator.add_action({
