@@ -1,24 +1,24 @@
 -- test file
-local exe = require("lua-cmake.target.cxx.executable")
-local lib = require("lua-cmake.target.cxx.library")
+-- local exe = require("lua-cmake.target.cxx.executable")
+-- local lib = require("lua-cmake.target.cxx.library")
 
-local imported_exe = require("lua-cmake.target.imported.executable")
-local imported_lib = require("lua-cmake.target.imported.library")
+-- local imported_exe = require("lua-cmake.target.imported.executable")
+-- local imported_lib = require("lua-cmake.target.imported.library")
 
 cmake.version("3.28")
 
-imported_exe {
+cmake.targets.imported.executable({
     name = "test_exe_imported",
     global = true
-}
+})
 
-imported_lib {
+cmake.targets.imported.library({
     name = "test_lib_imported",
     type = "static",
     global = true
-}
+})
 
-exe {
+cmake.targets.cxx.executable({
     name = "test_exe",
     srcs = {
         "test.cpp"
@@ -52,9 +52,9 @@ exe {
             }
         }
     }
-}
+})
 
-lib {
+cmake.targets.cxx.library({
     name = "test_lib",
     type = "static",
     exclude_from_all = true,
@@ -62,7 +62,7 @@ lib {
         "test.cpp",
         "test2.cpp"
     },
-}
+})
 
 cmake.include_directories("test", "test2")
 
@@ -74,3 +74,5 @@ cmake.add_definition("testasd", "etsetasd")
 cmake._if("${CMAKE_BUILD_TYPE} STREQUAL \"Debug\"", function()
     cmake.set("Test", "Test")
 end)
+
+cmake.add_subdirectory("test")

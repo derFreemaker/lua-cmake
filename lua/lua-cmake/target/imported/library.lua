@@ -31,4 +31,5 @@ function library:__init(config)
     })
 end
 
+cmake.targets.imported.library = library
 return class("lua-cmake.target.imported.library", library)

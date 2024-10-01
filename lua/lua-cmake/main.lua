@@ -39,18 +39,18 @@ local function setup_path()
     if lua_cmake_dir == nil then
         error("LUA_CMAKE_DIR env variable not defined. Is needed for loading libraries.")
     end
+    lua_cmake_dir = lua_cmake_dir:gsub("\\", "/")
 
     if os_name == "windows" then
-        lua_cmake_dir = lua_cmake_dir:gsub("/", "\\")
-        if lua_cmake_dir:sub(lua_cmake_dir:len() - 1) ~= "\\" then
-            lua_cmake_dir = lua_cmake_dir .. "\\"
+        if lua_cmake_dir:sub(lua_cmake_dir:len()) ~= "/" then
+            lua_cmake_dir = lua_cmake_dir .. "/"
         end
 
         -- For Windows: add the path to the directory containing the .dll
-        package.cpath = package.cpath .. ";" .. lua_cmake_dir .. "lib\\?.dll"
-        package.path = package.path .. ";" .. lua_cmake_dir .. "\\lua\\?.lua"
+        package.cpath = package.cpath .. ";" .. lua_cmake_dir .. "lib/?.dll"
+        package.path = package.path .. ";" .. lua_cmake_dir .. "lua/?.lua"
     else
-        if lua_cmake_dir:sub(lua_cmake_dir:len() - 1) ~= "/" then
+        if lua_cmake_dir:sub(lua_cmake_dir:len()) ~= "/" then
             lua_cmake_dir = lua_cmake_dir .. "/"
         end
 
@@ -105,6 +105,7 @@ local stopwatch = require("lua-cmake.utils.stopwatch")
 local sw_total = stopwatch()
 sw_total:start()
 
+local string_writer = require("lua-cmake.utils.string_writer")
 require("lua-cmake.cmake.cmake")
 
 do
@@ -159,7 +160,7 @@ do
         cmake_file:write(...)
     end
 
-    local writer = require("lua-cmake.utils.string_writer")(write)
+    local writer = string_writer(write)
 
     ---@diagnostic disable-next-line: invisible
     cmake.generator.generate(writer)

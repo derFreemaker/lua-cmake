@@ -16,13 +16,19 @@ function string_writer:__init(write)
 end
 
 ---@param indent integer | nil
+---@return lua-cmake.utils.string_writer
 function string_writer:add_indent(indent)
     self.m_indent = self.m_indent + (indent or 1)
+
+    return self
 end
 
 ---@param indent integer | nil
+---@return lua-cmake.utils.string_writer
 function string_writer:remove_indent(indent)
     self.m_indent = self.m_indent - (indent or 1)
+
+    return self
 end
 
 ---@param ... string

@@ -30,4 +30,5 @@ function executable:__init(config)
     })
 end
 
+cmake.targets.imported.executable = executable
 return class("lua-cmake.target.imported.executable", executable)
