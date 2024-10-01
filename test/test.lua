@@ -76,3 +76,5 @@ cmake._if("${CMAKE_BUILD_TYPE} STREQUAL \"Debug\"", function()
 end)
 
 cmake.add_subdirectory("test")
+
+cmake.add_definition("test", "tets2")
