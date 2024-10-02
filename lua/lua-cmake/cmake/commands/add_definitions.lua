@@ -55,6 +55,10 @@ cmake.generator.optimizer.add_strat("cmake-add_definitions", function(iter, valu
     local changed = false
 
     for index, definition in ipairs(value.context.definitions) do
+        if definition[1]:find("${") or (definition[2] and definition[2]:find("${")) then
+            goto continue
+        end
+
         local key = definition[1] .. tostring(definition[2])
         if value.context.global_definitions[key] then
             value.context.definitions[index] = nil

@@ -27,8 +27,9 @@ require("lua-cmake.cmake.commands.version")
 require("lua-cmake.cmake.commands.write")
 
 -- targets
-require("lua-cmake.target.cxx.executable")
-require("lua-cmake.target.cxx.library")
-require("lua-cmake.target.imported.executable")
-require("lua-cmake.target.imported.library")
-require("lua-cmake.target.imported.package")
+cmake.targets.cxx.executable = require("lua-cmake.target.cxx.executable")
+cmake.targets.cxx.library = require("lua-cmake.target.cxx.library")
+
+cmake.targets.imported.executable = require("lua-cmake.target.imported.executable")
+cmake.targets.imported.library = require("lua-cmake.target.imported.library")
+cmake.targets.imported.package = require("lua-cmake.target.imported.package")

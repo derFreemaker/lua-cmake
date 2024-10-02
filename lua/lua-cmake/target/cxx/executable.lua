@@ -60,5 +60,4 @@ function executable:__init(config)
     })
 end
 
-cmake.targets.cxx.executable = executable
 return class("lua-cmake.target.cxx.executable", executable)

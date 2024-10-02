@@ -35,6 +35,10 @@ cmake.generator.optimizer.add_strat("cmake-add_compile_options", function(iter, 
     local changed = false
 
     for index, option in ipairs(value.context.options) do
+        if option:find("${", nil, true) then
+            goto continue
+        end
+
         if value.context.compile_options[option] then
             value.context.options[index] = nil
             changed = true

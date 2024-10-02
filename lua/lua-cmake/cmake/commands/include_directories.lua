@@ -1,7 +1,6 @@
 ---@class lua-cmake.cmake
 local cmake = _G.cmake
 
---//TODO: add detection if variable is used since they can change over time and there for not easily optimized out
 local global_include_directories = {}
 ---@param ... string
 function cmake.include_directories(...)
@@ -40,6 +39,10 @@ cmake.generator.optimizer.add_strat("cmake-include_directories", function(iter, 
     local changed = false
 
     for index, dir in ipairs(value.context.dirs) do
+        if dir:find("${", nil, true) then
+            goto continue
+        end
+
         if value.context.include_directories[dir] then
             value.context.dirs[index] = nil
             changed = true

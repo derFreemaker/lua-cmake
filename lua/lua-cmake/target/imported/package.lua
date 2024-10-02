@@ -186,5 +186,4 @@ function package:__init(config)
     })
 end
 
-cmake.targets.imported.package = package
 return class("lua-cmake.imported.package", package)

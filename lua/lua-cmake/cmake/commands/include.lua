@@ -1,7 +1,6 @@
 ---@class lua-cmake.cmake
 local cmake = _G.cmake
 
---//TODO: add detection if variable is used since they can change over time and there for not easily optimized out
 local global_includes = {}
 ---@param include string
 ---@param optional boolean | nil
@@ -41,6 +40,10 @@ end
 
 ---@param value lua-cmake.gen.action<{ include: string, optional: boolean, result_var: boolean, no_policy_scope: boolean, includes: table<string, true> }>
 cmake.generator.optimizer.add_strat("cmake-include", function(iter, value)
+    if value.context.include:find("${") then
+        return
+    end
+
     local key = value.context.include ..
         tostring(value.context.optional) .. tostring(value.context.result_var) .. tostring(value.context.no_policy_scope)
     if value.context.includes[key] then
