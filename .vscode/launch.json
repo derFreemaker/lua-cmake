@@ -10,8 +10,9 @@
             "name": "Debug lua-cmake",
             "program": "${workspaceFolder}/lua/lua-cmake/main.lua",
             "arg": [
+                "--optimize",
+                "--output", "test/CMakeLists.txt",
                 "${workspaceFolder}/test/test.lua",
-                "--output", "test/CMakeLists.txt"
             ]
         },
         {

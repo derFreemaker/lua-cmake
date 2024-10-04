@@ -19,7 +19,7 @@ return function(lua_cmake_dir)
         success, config = pcall(function() return loadfile(global_config_file)() end)
         if not success or type(config) ~= "table" then
             print("lua-cmake: error loading config '" .. global_config_file .. "' (should return a table)")
-            return default_config
+            return config
         end
     end
 

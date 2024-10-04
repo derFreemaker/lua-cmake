@@ -59,18 +59,10 @@ if not lfs_status then
 end
 require("lua-cmake.third_party.derFreemaker.class_system")
 
-local cli_parser = require("lua.lua-cmake.third_party.mpeterv.cli_parser")
 local string_writer = require("lua-cmake.utils.string_writer")
 require("lua-cmake.cmake.cmake")
 cmake.config = require("lua-cmake.cmake.config")(lua_cmake_dir)
-
-local parser = cli_parser("lua-cmake", "Used to generate cmake files configured from lua.")
-parser:argument("config", "The config file for lua-cmake.", cmake.config.lua_cmake.default_config)
-parser:option("-o --output", "The output file path in which the generate cmake gets written to.", cmake.config.lua_cmake.default_cmake)
-parser:option("-p --optimize", "Sets the optimizer should NOT be run. (Disabling can improve stability)", cmake.config.lua_cmake.optimize)
-
----@type { config: string, output: string | nil, optimize: boolean }
-local args = parser:parse()
+cmake.args = require("lua-cmake.cmake.args")({...})
 
 --//TODO: add version flag
 
@@ -80,30 +72,30 @@ do
         error("unable to get current directory")
     end
 
-    args.config = make_path_absolute(args.config, current_dir)
-    args.output = make_path_absolute(args.output, current_dir)
+    cmake.args.config = make_path_absolute(cmake.args.config, current_dir)
+    cmake.args.output = make_path_absolute(cmake.args.output, current_dir)
 
     do
-        local reverse = args.config:reverse()
+        local reverse = cmake.args.config:reverse()
         local pos = reverse:find("/", reverse:find("/", nil, true), true)
-        local parent_folder = args.config:sub(0, reverse:len() - pos)
+        local parent_folder = cmake.args.config:sub(0, reverse:len() - pos)
         lfs.chdir(parent_folder)
     end
 end
 
-if not lfs.exists(args.config) then
-    error("config file not found: " .. args.config)
+if not lfs.exists(cmake.args.config) then
+    error("config file not found: " .. cmake.args.config)
 end
-print("lua-cmake: config file '" .. args.config .. "'")
+print("lua-cmake: config file '" .. cmake.args.config .. "'")
 
 local stopwatch = require("lua-cmake.utils.stopwatch")
 local sw_total = stopwatch()
 sw_total:start()
 
 do
-    local config_func, config_err_msg = loadfile(args.config, "t")
+    local config_func, config_err_msg = loadfile(cmake.args.config, "t")
     if not config_func then
-        error("unable to load entry file: '" .. args.config .. "' \nerror:\n  " .. config_err_msg)
+        error("unable to load entry file: '" .. cmake.args.config .. "' \nerror:\n  " .. config_err_msg)
     end
     local config_thread = coroutine.create(config_func)
     local config_success
@@ -125,7 +117,7 @@ if not cmake.get_version() then
     error("A cmake version is required to be set! cmake.version(...)")
 end
 
-if args.optimize then
+if cmake.args.optimize then
     local sw = stopwatch()
     sw:start()
 
@@ -142,9 +134,9 @@ do
     local sw = stopwatch()
     sw:start()
 
-    local cmake_file = io.open(args.output, "w+")
+    local cmake_file = io.open(cmake.args.output, "w+")
     if not cmake_file then
-        error("unable to open output file: " .. args.output)
+        error("unable to open output file: " .. cmake.args.output)
     end
 
     ---@param ... string

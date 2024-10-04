@@ -6,6 +6,7 @@
             "type": "shell",
             "command": "lua-cmake",
             "args": [
+                "--optimize",
                 "--output", "test/CMakeLists.txt",
                 "test/test.lua",
             ],
