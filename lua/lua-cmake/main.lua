@@ -1,3 +1,12 @@
+local lua_cmake_dir = os.getenv("LUA_CMAKE_DIR")
+if lua_cmake_dir == nil then
+    error("LUA_CMAKE_DIR env variable not defined. Is needed for loading libraries.")
+end
+lua_cmake_dir = lua_cmake_dir:gsub("\\", "/")
+if lua_cmake_dir:sub(lua_cmake_dir:len()) ~= "/" then
+    lua_cmake_dir = lua_cmake_dir .. "/"
+end
+
 ---@return "windows" | "linux"
 local function get_os()
     if package.config:sub(1, 1) == '\\' then
@@ -33,31 +42,13 @@ local function make_path_absolute(path, relative)
 end
 
 local function setup_path()
-    local os_name = get_os()
-
-    local lua_cmake_dir = os.getenv("LUA_CMAKE_DIR")
-    if lua_cmake_dir == nil then
-        error("LUA_CMAKE_DIR env variable not defined. Is needed for loading libraries.")
+    local dynamic_lib_ext = ".so"
+    if get_os() == "windows" then
+        dynamic_lib_ext = ".dll"
     end
-    lua_cmake_dir = lua_cmake_dir:gsub("\\", "/")
 
-    if os_name == "windows" then
-        if lua_cmake_dir:sub(lua_cmake_dir:len()) ~= "/" then
-            lua_cmake_dir = lua_cmake_dir .. "/"
-        end
-
-        -- For Windows: add the path to the directory containing the .dll
-        package.cpath = package.cpath .. ";" .. lua_cmake_dir .. "lib/?.dll"
-        package.path = package.path .. ";" .. lua_cmake_dir .. "lua/?.lua"
-    else
-        if lua_cmake_dir:sub(lua_cmake_dir:len()) ~= "/" then
-            lua_cmake_dir = lua_cmake_dir .. "/"
-        end
-
-        -- For Linux: add the path to the directory containing the .so
-        package.cpath = package.cpath .. ";" .. lua_cmake_dir .. "lib/?.so"
-        package.path = package.path .. ";" .. lua_cmake_dir .. "/lua/?.lua"
-    end
+    package.path = package.path .. ";" .. lua_cmake_dir .. "lua/?.lua"
+    package.cpath = package.cpath .. ";" .. lua_cmake_dir .. "lib/?" .. dynamic_lib_ext
 end
 setup_path()
 
@@ -68,13 +59,17 @@ if not lfs_status then
 end
 require("lua-cmake.third_party.derFreemaker.class_system")
 
-local cli_parser = require("lua-cmake.third_party.other.cli_parser")
-local parser = cli_parser("lua-cmake", "Used to generate cmake files configured from lua.")
-parser:argument("config", "The config file for lua-cmake.", "luacmake.lua")
-parser:option("-o --output", "The output file path in which the generate cmake gets written to.", "CMakeLists.txt")
-parser:flag("-p --no-optimize", "Sets the optimizer should NOT be run. (Disabling can improve stability)")
+local cli_parser = require("lua.lua-cmake.third_party.mpeterv.cli_parser")
+local string_writer = require("lua-cmake.utils.string_writer")
+require("lua-cmake.cmake.cmake")
+cmake.config = require("lua-cmake.cmake.config")(lua_cmake_dir)
 
----@type { config: string, output: string | nil, no_optimize: boolean }
+local parser = cli_parser("lua-cmake", "Used to generate cmake files configured from lua.")
+parser:argument("config", "The config file for lua-cmake.", cmake.config.lua_cmake.default_config)
+parser:option("-o --output", "The output file path in which the generate cmake gets written to.", cmake.config.lua_cmake.default_cmake)
+parser:option("-p --optimize", "Sets the optimizer should NOT be run. (Disabling can improve stability)", cmake.config.lua_cmake.optimize)
+
+---@type { config: string, output: string | nil, optimize: boolean }
 local args = parser:parse()
 
 --//TODO: add version flag
@@ -105,9 +100,6 @@ local stopwatch = require("lua-cmake.utils.stopwatch")
 local sw_total = stopwatch()
 sw_total:start()
 
-local string_writer = require("lua-cmake.utils.string_writer")
-require("lua-cmake.cmake.cmake")
-
 do
     local config_func, config_err_msg = loadfile(args.config, "t")
     if not config_func then
@@ -133,7 +125,7 @@ if not cmake.get_version() then
     error("A cmake version is required to be set! cmake.version(...)")
 end
 
-if not args.no_optimize then
+if args.optimize then
     local sw = stopwatch()
     sw:start()
 

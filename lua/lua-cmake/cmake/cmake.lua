@@ -1,16 +1,17 @@
 ---@class lua-cmake.cmake
 ---@field generator lua-cmake.gen.generator
 ---@field targets lua-cmake.targets
+---@field config table
 ---
 ---@field private m_min_cmake_version integer[] | nil
 ---@field private m_max_cmake_version integer[] | nil
-local cmake = {
+cmake = {
     generator = require("lua-cmake.gen.generator"),
     ---@diagnostic disable: missing-fields
     targets = {
         cxx = {},
         imported = {}
-    }
+    },
     ---@diagnostic enable: missing-fields
 }
 _G.cmake = cmake

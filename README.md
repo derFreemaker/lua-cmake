@@ -15,7 +15,7 @@ For command options use `lua-cmake -h`.
 The goal is to make writing complex system in cmake easier by making you able to configure in lua.
 The way it works is it generates a cmake file based on the configuration, this makes you able to use all the cmake features.
 
-## Builtin Systems
+## Builtin
 - For filesystem interactions [LuaFileSystem](https://lunarmodules.github.io/luafilesystem) (with some small additions) is comming with it and can be required directly like so `require("lfs")`.
 - In order to over engineer this a [ClassSystem](https://github.com/derFreemaker/Lua-Class-System) is builtin with the two gobal functions `class`, `interface` and can be require like so `require("lua-cmake.third_party.derFreemaker.ClassSystem")`.
 
