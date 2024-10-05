@@ -16,31 +16,6 @@ local function get_os()
     end
 end
 
----@param path string
----@param relative string
----@return string
-local function make_path_absolute(path, relative)
-    local new_path
-
-    if get_os() == "windows" then
-        local str = path:sub(2, 2)
-        if str == ":" then
-            new_path = path
-        else
-            new_path = relative .. "/" .. path
-        end
-        new_path = new_path:gsub("\\", "/")
-    else
-        if path:sub(1, 1) == "/" then
-            new_path = path
-        else
-            new_path = relative .. "/" .. path
-        end
-    end
-
-    return new_path
-end
-
 local function setup_path()
     local dynamic_lib_ext = ".so"
     if get_os() == "windows" then
@@ -63,25 +38,6 @@ local string_writer = require("lua-cmake.utils.string_writer")
 require("lua-cmake.cmake.cmake")
 cmake.config = require("lua-cmake.cmake.config")(lua_cmake_dir)
 cmake.args = require("lua-cmake.cmake.args")({...})
-
---//TODO: add version flag
-
-do
-    local current_dir = lfs.currentdir()
-    if not current_dir then
-        error("unable to get current directory")
-    end
-
-    cmake.args.config = make_path_absolute(cmake.args.config, current_dir)
-    cmake.args.output = make_path_absolute(cmake.args.output, current_dir)
-
-    do
-        local reverse = cmake.args.config:reverse()
-        local pos = reverse:find("/", reverse:find("/", nil, true), true)
-        local parent_folder = cmake.args.config:sub(0, reverse:len() - pos)
-        lfs.chdir(parent_folder)
-    end
-end
 
 if not lfs.exists(cmake.args.config) then
     error("config file not found: " .. cmake.args.config)

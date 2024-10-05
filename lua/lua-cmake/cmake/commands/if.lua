@@ -81,3 +81,5 @@ function cmake._if(condition, body)
 
     return elses
 end
+
+--//TODO: add optimizer strat that removes the if if there are no statements in it.

@@ -31,10 +31,7 @@ cmake.targets.cxx.executable({
             {
                 type = "private",
                 items = {
-                    {
-                        "Name",
-                        "Test"
-                    }
+                    { "Name", "Test" }
                 }
             }
         },
