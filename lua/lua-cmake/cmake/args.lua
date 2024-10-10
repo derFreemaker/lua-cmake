@@ -38,11 +38,11 @@ end
 local parser = cli_parser("lua-cmake", "Used to generate cmake files configured from lua.")
 parser:option("-i --input")
     :description("The config file for lua-cmake should run.")
-    :default(cmake.config.lua_cmake.default_config)
+    :default(cmake.config.lua_cmake.config)
 
 parser:option("-o --output")
     :description("The output file path in which the generate cmake gets written to.")
-    :default(cmake.config.lua_cmake.default_cmake)
+    :default(cmake.config.lua_cmake.cmake)
 
 parser:flag("-p --optimize")
     :description("Enables the optimizer.")

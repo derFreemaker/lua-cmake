@@ -4,8 +4,8 @@ local utils = require("lua-cmake.utils")
 
 local default_config = {
     lua_cmake = {
-        default_config = "luacmake.lua",
-        default_cmake = "CMakeLists.txt",
+        config = "luacmake.lua",
+        cmake = "CMakeLists.txt",
         optimize = true,
         verbose = false
     },
