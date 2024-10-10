@@ -45,14 +45,17 @@ parser:option("-o --output")
     :default(cmake.config.lua_cmake.default_cmake)
 
 parser:flag("-p --optimize")
-    :description("enables the optimizer")
+    :description("Enables the optimizer.")
     :default(cmake.config.lua_cmake.optimize)
 
 parser:flag("-q --no-optimize")
-    :description("disables the optimizer (disabling might fix issues)")
+    :description("Disables the optimizer. (disabling might fix issues)")
     :action(function(args)
         args.optimize = false
     end)
+
+parser:flag("-v --verbose")
+    :default(cmake.config.lua_cmake.verbose)
 
 --//TODO: add version flag
 

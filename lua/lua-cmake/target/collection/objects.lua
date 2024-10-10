@@ -1,16 +1,16 @@
 local utils = require("lua-cmake.utils")
 
----@class lua-cmake.target.collection.srcs.config
+---@class lua-cmake.target.collection.objects.config
 ---@field name string
 ---@field srcs string[]
 
-local kind = "lua-cmake.targets.collection.srcs"
----@class lua-cmake.target.collection.srcs : object
----@field config lua-cmake.target.collection.srcs.config
+local kind = "lua-cmake.targets.collection.objects"
+---@class lua-cmake.target.collection.objects : object
+---@field config lua-cmake.target.collection.objects.config
 local srcs_collection = {}
 
 ---@private
----@param config lua-cmake.target.collection.srcs.config
+---@param config lua-cmake.target.collection.objects.config
 function srcs_collection:__init(config)
     self.config = utils.table.readonly(config)
 

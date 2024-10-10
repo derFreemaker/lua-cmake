@@ -42,7 +42,9 @@ loadfile(lua_cmake_dir .. "lua/lua-cmake/cmake/cmake.lua")(...)
 if not lfs.exists(cmake.args.input) then
     error("config file not found: " .. cmake.args.input)
 end
-print("lua-cmake: config file '" .. cmake.args.input .. "'")
+if cmake.config.lua_cmake.verbose then
+    print("lua-cmake: config file '" .. cmake.args.input .. "'")
+end
 
 local stopwatch = require("lua-cmake.utils.stopwatch")
 local sw_total = stopwatch()
@@ -62,7 +64,7 @@ do
     config_success, config_err_msg = coroutine.resume(config_thread)
     if not config_success then
         print("error in config file: " .. config_err_msg .. "\n" .. debug.traceback(config_thread))
-        return -1
+        os.exit(-1)
     end
 
     ---@diagnostic disable-next-line: invisible
@@ -125,6 +127,4 @@ do
 end
 
 sw_total:stop()
-print("lua-cmake: total (" .. sw_total:get_pretty_seconds() .. "s)")
-
-return 0
+print("lua-cmake: total " .. sw_total:get_pretty_seconds() .. "s")

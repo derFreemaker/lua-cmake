@@ -1,4 +1,4 @@
 ---@meta _
 
 ---@class lua-cmake.targets.collection
----@field srcs lua-cmake.target.collection.srcs
+---@field objects lua-cmake.target.collection.objects

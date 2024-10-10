@@ -38,7 +38,7 @@ require("lua-cmake.cmake.commands.version")
 require("lua-cmake.cmake.commands.write")
 
 -- targets
-cmake.targets.collection.srcs = require("lua-cmake.target.collection.srcs")
+cmake.targets.collection.objects = require("lua-cmake.target.collection.objects")
 
 cmake.targets.cxx.executable = require("lua-cmake.target.cxx.executable")
 cmake.targets.cxx.library = require("lua-cmake.target.cxx.library")

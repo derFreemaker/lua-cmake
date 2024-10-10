@@ -6,7 +6,8 @@ local default_config = {
     lua_cmake = {
         default_config = "luacmake.lua",
         default_cmake = "CMakeLists.txt",
-        optimize = true
+        optimize = true,
+        verbose = false
     },
 }
 

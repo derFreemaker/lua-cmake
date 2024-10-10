@@ -1,7 +1,7 @@
 cmake.version("3.28")
 
-cmake.targets.collection.srcs({
-    name = "test_srcs_collection",
+cmake.targets.collection.objects({
+    name = "test_objects_collection",
     srcs = {
         "test_srcs.cpp",
     }
@@ -15,7 +15,7 @@ cmake.targets.cxx.library({
         "test2.cpp"
     },
     deps = {
-        "test_srcs_collection"
+        "test_objects_collection"
     }
 })
 
