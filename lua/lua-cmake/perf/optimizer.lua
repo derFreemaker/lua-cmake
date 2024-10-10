@@ -32,11 +32,20 @@ end
 ---@param index integer
 ---@param kind string
 ---@param strategies lua-cmake.perf.strategy<any>[]
+---@return boolean has_error
 function optimizer.run_strategies(iter, index, kind, strategies)
+    local has_error = false
+
     for _, strat in ipairs(strategies) do
         iter:set_index(index)
         while true do
-            strat(iter, iter:current())
+            local strat_thread = coroutine.create(strat)
+            local success, msg = coroutine.resume(strat_thread, iter, iter:current())
+            if not success then
+                has_error = true
+                print("lua-cmake: optimizer strat for kind: '" .. kind .. "' failed:\n"
+                    .. debug.traceback(strat_thread, msg))
+            end
 
             if not iter:next_is_same() then
                 iter:increment()
@@ -45,11 +54,15 @@ function optimizer.run_strategies(iter, index, kind, strategies)
             iter:increment()
         end
     end
+
+    return has_error
 end
 
 ---@private
 ---@param actions lua-cmake.gen.action<any>[]
+---@return boolean has_error
 function optimizer.optimize(actions)
+    local has_error = false
     local iter = iterator(actions)
 
     while not iter:empty() do
@@ -60,7 +73,10 @@ function optimizer.optimize(actions)
             goto continue
         end
 
-        optimizer.run_strategies(iter, iter:index(), kind, kind_strategies)
+        local run_has_error = optimizer.run_strategies(iter, iter:index(), kind, kind_strategies)
+        if run_has_error then
+            has_error = true
+        end
 
         ::continue::
     end
@@ -71,6 +87,8 @@ function optimizer.optimize(actions)
         actions[i] = action
         i = i + 1
     end
+
+    return has_error
 end
 
 return optimizer

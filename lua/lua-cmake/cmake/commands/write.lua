@@ -28,7 +28,7 @@ function cmake.write_line(...)
     end
 
     cmake.generator.add_action({
-        kind = "cmake-write",
+        kind = "cmake-write_line",
         ---@param context { str: string[] }
         func = function(writer, context)
             writer:write_line(table.unpack(context.str))

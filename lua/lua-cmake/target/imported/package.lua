@@ -1,3 +1,5 @@
+local utils = require("lua-cmake.utils")
+
 ---@class lua-cmake.imported.package.config
 ---@field name string
 ---@field version string | nil

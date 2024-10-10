@@ -8,7 +8,7 @@
             "args": [
                 "--optimize",
                 "--output", "test/CMakeLists.txt",
-                "test/test.lua",
+                "--input", "test/test.lua",
             ],
             "problemMatcher": []
         },
@@ -19,7 +19,7 @@
             "args": [
                 "--no-optimize",
                 "--output", "test/CMakeLists.txt",
-                "test/test.lua",
+                "--input", "test/test.lua",
             ],
             "problemMatcher": []
         }

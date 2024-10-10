@@ -1,5 +1,5 @@
 local lfs = require("lfs")
-local cli_parser = require("lua.lua-cmake.third_party.mpeterv.cli_parser")
+local cli_parser = require("lua-cmake.third_party.mpeterv.cli_parser")
 
 ---@return "windows" | "linux"
 local function get_os()
@@ -36,8 +36,8 @@ local function make_path_absolute(path, relative)
 end
 
 local parser = cli_parser("lua-cmake", "Used to generate cmake files configured from lua.")
-parser:argument("config")
-    :description("The config file for lua-cmake.")
+parser:option("-i --input")
+    :description("The config file for lua-cmake should run.")
     :default(cmake.config.lua_cmake.default_config)
 
 parser:option("-o --output")
@@ -47,20 +47,17 @@ parser:option("-o --output")
 parser:flag("-p --optimize")
     :description("enables the optimizer")
     :default(cmake.config.lua_cmake.optimize)
-    :action(function(args)
-        args.optimize = true
-    end)
 
 parser:flag("-q --no-optimize")
-    :description("disables the optimizer")
+    :description("disables the optimizer (disabling might fix issues)")
     :action(function(args)
         args.optimize = false
-        args.no_optimize = nil
     end)
 
 --//TODO: add version flag
 
----@return { config: string, output: string | nil, optimize: boolean }
+---@alias lua-cmake.cmake.args { input: string, output: string | nil, optimize: boolean }
+---@return lua-cmake.cmake.args
 return function(args)
     args = parser:parse(args)
 
@@ -69,12 +66,12 @@ return function(args)
         error("unable to get current directory")
     end
 
-    args.config = make_path_absolute(args.config, current_dir)
+    args.input = make_path_absolute(args.input, current_dir)
     args.output = make_path_absolute(args.output, current_dir)
 
-    local reverse = args.config:reverse()
+    local reverse = args.input:reverse()
     local pos = reverse:find("/", reverse:find("/", nil, true), true)
-    local parent_folder = args.config:sub(0, reverse:len() - pos)
+    local parent_folder = args.input:sub(0, reverse:len() - pos)
     lfs.chdir(parent_folder)
 
     return args

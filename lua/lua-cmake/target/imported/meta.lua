@@ -1,4 +1,4 @@
----@meta
+---@meta _
 
 ---@class lua-cmake.targets.imported
 ---@field executable lua-cmake.target.imported.executable

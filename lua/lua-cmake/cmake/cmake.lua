@@ -1,20 +1,30 @@
 ---@class lua-cmake.cmake
----@field generator lua-cmake.gen.generator
----@field targets lua-cmake.targets
 ---@field config table
+---@field args lua-cmake.cmake.args
 ---
----@field private m_min_cmake_version integer[] | nil
----@field private m_max_cmake_version integer[] | nil
-cmake = {
-    generator = require("lua-cmake.gen.generator"),
+---@field path_resolver lua-cmake.filesystem.path_resolver
+---
+---@field registry lua-cmake.dep.registry
+---@field generator lua-cmake.gen.generator
+---
+---@field targets lua-cmake.targets
+_G.cmake = {
+    config = require("lua-cmake.cmake.config"),
+
     ---@diagnostic disable: missing-fields
     targets = {
+        collection = {},
         cxx = {},
-        imported = {}
+        imported = {},
     },
     ---@diagnostic enable: missing-fields
 }
-_G.cmake = cmake
+cmake.args = require("lua-cmake.cmake.args")({ ... })
+
+cmake.path_resolver = require("lua-cmake.filesystem.path_resolver")
+
+cmake.registry = require("lua-cmake.dep.registry")
+cmake.generator = require("lua-cmake.gen.generator")
 
 -- commands
 require("lua-cmake.cmake.commands.add_definitions")
@@ -28,6 +38,8 @@ require("lua-cmake.cmake.commands.version")
 require("lua-cmake.cmake.commands.write")
 
 -- targets
+cmake.targets.collection.srcs = require("lua-cmake.target.collection.srcs")
+
 cmake.targets.cxx.executable = require("lua-cmake.target.cxx.executable")
 cmake.targets.cxx.library = require("lua-cmake.target.cxx.library")
 

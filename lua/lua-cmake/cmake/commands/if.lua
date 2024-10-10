@@ -82,4 +82,30 @@ function cmake._if(condition, body)
     return elses
 end
 
---//TODO: add optimizer strat that removes the if if there are no statements in it.
+--//TODO: add optimizer strat that removes the if if there are no actions in it.
+--// can add 'NOT <condition>' to inverse
+---@param value lua-cmake.gen.action<{ condition: string }>
+cmake.generator.optimizer.add_strat("cmake-if_statement", function(iter, value)
+    if iter:next_is("cmake-if_statement_end") then
+        iter:remove_current()
+        iter:remove_next()
+        return
+    end
+
+    if iter:next_is("cmake-if_statement_else") then
+        if value.context.condition:sub(1,3) == "NOT" then
+            local trim = 4
+            if value.context.condition:sub(4, 4) == " " then
+                trim = 5
+            end
+            value.context.condition = value.context.condition:sub(trim)
+        else
+            value.context.condition = "NOT " .. value.context.condition
+        end
+        iter:remove_next()
+    end
+
+    -- if iter:next_is("cmake-if_statement_elseif") then
+    --     --//TODO: handle next on is elseif
+    -- end
+end)

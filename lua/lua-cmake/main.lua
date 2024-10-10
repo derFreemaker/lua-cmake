@@ -32,26 +32,26 @@ local lfs_status, lfs = pcall(require, "lfs")
 if not lfs_status then
     error("Failed to load LuaFileSystem library: " .. lfs)
 end
+
 require("lua-cmake.third_party.derFreemaker.class_system")
-
 local string_writer = require("lua-cmake.utils.string_writer")
-require("lua-cmake.cmake.cmake")
-cmake.config = require("lua-cmake.cmake.config")(lua_cmake_dir)
-cmake.args = require("lua-cmake.cmake.args")({...})
 
-if not lfs.exists(cmake.args.config) then
-    error("config file not found: " .. cmake.args.config)
+--//? We are loading cmake like this to pass the var args to it.
+loadfile(lua_cmake_dir .. "lua/lua-cmake/cmake/cmake.lua")(...)
+
+if not lfs.exists(cmake.args.input) then
+    error("config file not found: " .. cmake.args.input)
 end
-print("lua-cmake: config file '" .. cmake.args.config .. "'")
+print("lua-cmake: config file '" .. cmake.args.input .. "'")
 
 local stopwatch = require("lua-cmake.utils.stopwatch")
 local sw_total = stopwatch()
 sw_total:start()
 
 do
-    local config_func, config_err_msg = loadfile(cmake.args.config, "t")
+    local config_func, config_err_msg = loadfile(cmake.args.input, "t")
     if not config_func then
-        error("unable to load entry file: '" .. cmake.args.config .. "' \nerror:\n  " .. config_err_msg)
+        error("unable to load entry file: '" .. cmake.args.input .. "' \nerror:\n  " .. config_err_msg)
     end
     local config_thread = coroutine.create(config_func)
     local config_success
@@ -62,7 +62,13 @@ do
     config_success, config_err_msg = coroutine.resume(config_thread)
     if not config_success then
         print("error in config file: " .. config_err_msg .. "\n" .. debug.traceback(config_thread))
-        os.exit(-1)
+        return -1
+    end
+
+    ---@diagnostic disable-next-line: invisible
+    local has_error = cmake.registry.resolve()
+    if has_error then
+        print("lua-cmake: dependencies resolved with error(s) (this probably will corrupt the configuration)")
     end
 
     sw:stop()
@@ -78,7 +84,10 @@ if cmake.args.optimize then
     sw:start()
 
     ---@diagnostic disable-next-line: invisible
-    cmake.generator.optimize()
+    local has_error = cmake.generator.optimize()
+    if has_error then
+        print("lua-cmake: optimizer finished with error(s) (this probably will corrupt the configuration)")
+    end
 
     sw:stop()
     print("lua-cmake: optimized (" .. sw:get_pretty_seconds() .. "s)")
@@ -103,7 +112,11 @@ do
     local writer = string_writer(write)
 
     ---@diagnostic disable-next-line: invisible
-    cmake.generator.generate(writer)
+    local has_error = cmake.generator.generate(writer)
+    if has_error then
+        print("lua-cmake: generator finished with error(s)")
+        cmake_file:write("\nmessage(FATAL_ERROR \"lua-cmake generator failed with error(s)\")")
+    end
 
     cmake_file:close()
 
@@ -113,3 +126,5 @@ end
 
 sw_total:stop()
 print("lua-cmake: total (" .. sw_total:get_pretty_seconds() .. "s)")
+
+return 0

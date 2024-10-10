@@ -1,7 +1,10 @@
----@class lua-cmake.target.imported.executable.config : object
+local utils = require("lua-cmake.utils")
+
+---@class lua-cmake.target.imported.executable.config
 ---@field name string
 ---@field global boolean | nil
 
+local kind = "lua-cmake.target.imported.executable"
 ---@class lua-cmake.target.imported.executable : object
 ---@field config lua-cmake.target.imported.executable.config
 ---@overload fun(config: lua-cmake.target.imported.executable.config) : lua-cmake.target.imported.executable
@@ -12,10 +15,9 @@ local executable = {}
 ---@private
 ---@param config lua-cmake.target.imported.executable.config
 function executable:__init(config)
-    self.config = config
+    self.config = utils.table.readonly(config)
 
     cmake.generator.add_action({
-        kind = "lua-cmake.target.imported.executable",
         ---@param context lua-cmake.target.imported.executable.config
         func = function(write, context)
             write:write("add_executable(", context.name, " IMPORTED")
@@ -28,6 +30,13 @@ function executable:__init(config)
         end,
         context = self.config
     })
+
+    cmake.registry.add_entry({
+        kind = kind,
+        get_name = function()
+            return self.config.name
+        end,
+    })
 end
 
-return class("lua-cmake.target.imported.executable", executable)
+return class(kind, executable)

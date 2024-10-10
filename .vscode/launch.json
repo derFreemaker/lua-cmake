@@ -12,7 +12,7 @@
             "arg": [
                 "--optimize",
                 "--output", "test/CMakeLists.txt",
-                "${workspaceFolder}/test/test.lua",
+                "--input", "${workspaceFolder}/test/test.lua",
             ]
         },
         {
@@ -23,7 +23,7 @@
             "arg": [
                 "--no-optimize",
                 "--output", "test/CMakeLists.txt",
-                "${workspaceFolder}/test/test.lua",
+                "--input", "${workspaceFolder}/test/test.lua",
             ]
         }
     ]

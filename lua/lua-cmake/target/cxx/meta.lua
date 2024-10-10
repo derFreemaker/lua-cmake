@@ -1,4 +1,4 @@
----@meta
+---@meta _
 
 ---@class lua-cmake.targets.cxx
 ---@field executable lua-cmake.target.cxx.executable

@@ -1,3 +1,4 @@
+local utils = require("lua-cmake.utils")
 local target_options = require("lua-cmake.target.options")
 
 ---@class lua-cmake.target.cxx.executable.config
@@ -10,6 +11,7 @@ local target_options = require("lua-cmake.target.options")
 ---@field exclude_from_all boolean | nil
 ---@field options lua-cmake.target.options | nil
 
+local kind = "lua-cmake.target.cxx.executable"
 ---@class lua-cmake.target.cxx.executable : object
 ---@field config lua-cmake.target.cxx.executable.config
 ---@overload fun(config: lua-cmake.target.cxx.executable.config) : lua-cmake.target.cxx.executable
@@ -22,8 +24,46 @@ local executable = {}
 function executable:__init(config)
     self.config = config
 
+    if not self.config.srcs then
+        self.config.srcs = {}
+    else
+        cmake.path_resolver.resolve_paths(self.config.srcs)
+    end
+
+    if not self.config.options then
+        self.config.options = {}
+    end
+    if not self.config.options.link_libraries then
+        self.config.options.link_libraries = {}
+    end
+
+    if not self.config.deps then
+        self.config.deps = {}
+    end
+
+    cmake.registry.add_entry({
+        get_name = function()
+            return self.config.name
+        end,
+
+        add_srcs = function(srcs)
+            for _, src in ipairs(srcs) do
+                table.insert(self.config.srcs, src)
+            end
+        end,
+        add_links = function(links)
+            for _, link in ipairs(links) do
+                table.insert(self.config.options.link_libraries, link)
+            end
+        end,
+
+        get_deps = function()
+            return self.config.deps
+        end,
+    })
+
     cmake.generator.add_action({
-        kind = "lua-cmake.target.cxx.executable",
+        kind = kind,
         ---@param context lua-cmake.target.cxx.executable.config
         func = function(writer, context)
             writer:write_line("add_executable(", context.name)
@@ -54,10 +94,20 @@ function executable:__init(config)
 
             writer:write_line(")")
 
-            target_options(writer, context.name, context.options)
+            cmake.generator.add_action({
+                kind = kind .. ".options",
+                ---@param options_context { name: string, options: lua-cmake.target.options }
+                func = function(options_writer, options_context)
+                    target_options(options_writer, options_context.name, options_context.options)
+                end,
+                context = {
+                    name = context.name,
+                    options = context.options
+                }
+            })
         end,
         context = self.config
     })
 end
 
-return class("lua-cmake.target.cxx.executable", executable)
+return class(kind, executable)
