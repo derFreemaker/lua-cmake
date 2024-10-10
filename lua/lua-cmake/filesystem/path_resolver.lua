@@ -19,6 +19,9 @@ function path_resolver.resolve_path(path_str)
 
     if not path:is_absolute() then
         local current_dir = lfs.currentdir():gsub("\\", "/")
+        if current_dir == project_dir then
+            return path_str
+        end
 
         path = utils_path.new(current_dir .. "/" .. path:to_string())
     end
