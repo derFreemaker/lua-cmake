@@ -57,11 +57,12 @@ if cmake.args.verbose then
     print("lua-cmake: config file '" .. cmake.args.input .. "'")
 end
 
+--//TODO: move into own file
+--//TODO: load init.lua if folder is given and add folder to package.path and package.cpath for `require(...)` for loading duration
 for _, plugin_path in pairs(cmake.config.lua_cmake.plugins) do
     local path = cmake.path_resolver.resolve_path(plugin_path, true)
     if not lfs.exists(path) then
-        print("lua-cmake: unable to find plugin: " .. path)
-        goto continue
+        error("lua-cmake: unable to find plugin: " .. path)
     end
 
     local plugin_func, load_msg = loadfile(path)
@@ -73,8 +74,6 @@ for _, plugin_path in pairs(cmake.config.lua_cmake.plugins) do
     if not success then
         error("error while executing plugin: " .. path .. "\n" .. debug.traceback(plugin_thread, run_msg))
     end
-
-    ::continue::
 end
 
 local stopwatch = require("lua-cmake.utils.stopwatch")

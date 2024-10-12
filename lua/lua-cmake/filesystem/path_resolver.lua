@@ -2,12 +2,6 @@
 local lfs = require("lfs")
 local utils = require("lua-cmake.utils")
 
-local project_dir = lfs.currentdir():gsub("\\", "/")
-if not project_dir then
-    error("unable to get lfs.currentdir()")
-end
-local project_dir_len = project_dir:len()
-
 ---@class lua-cmake.filesystem.path_resolver
 local path_resolver = {}
 
@@ -20,16 +14,16 @@ function path_resolver.resolve_path(path_str, absolute)
 
     if not path:is_absolute() then
         local current_dir = lfs.currentdir():gsub("\\", "/")
-        if current_dir ~= project_dir or absolute then
+        if current_dir ~= cmake.project_dir or absolute then
             path = utils.path.new(current_dir .. "/" .. path:to_string())
         end
     end
 
     path_str = path:to_string()
     if not absolute then
-        local pos = path_str:find(project_dir, nil, true)
+        local pos = path_str:find(cmake.project_dir, nil, true)
         if pos then
-            path_str = path_str:sub(pos + project_dir_len + 1)
+            path_str = path_str:sub(pos + cmake.project_dir:len() + 1)
         end
     end
 

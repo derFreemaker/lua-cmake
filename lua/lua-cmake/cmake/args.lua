@@ -35,33 +35,35 @@ local function make_path_absolute(path, relative)
     return new_path
 end
 
-local parser = argparse("lua-cmake", "Used to generate cmake files configured from lua.")
-parser:option("-i --input")
-    :description("The config file for lua-cmake should run.")
-    :default(cmake.config.lua_cmake.config)
-
-parser:option("-o --output")
-    :description("The output file path in which the generate cmake gets written to.")
-    :default(cmake.config.lua_cmake.cmake)
-
-parser:flag("-p --optimize")
-    :description("Enables the optimizer.")
-    :default(cmake.config.lua_cmake.optimize)
-
-parser:flag("-q --no-optimize")
-    :description("Disables the optimizer. (disabling might fix issues)")
-    :action(function(args)
-        args.optimize = false
-    end)
-
-parser:flag("-v --verbose")
-    :default(cmake.config.lua_cmake.verbose)
-
---//TODO: add version flag
-
 ---@alias lua-cmake.cmake.args { input: string, output: string | nil, optimize: boolean, verbose: boolean }
+---@param args table
+---@param config lua-cmake.config
 ---@return lua-cmake.cmake.args
-return function(args)
+return function(args, config)
+    local parser = argparse("lua-cmake", "Used to generate cmake files configured from lua.")
+    parser:option("-i --input")
+        :description("The config file for lua-cmake should run.")
+        :default(config.config)
+
+    parser:option("-o --output")
+        :description("The output file path in which the generate cmake gets written to.")
+        :default(config.cmake)
+
+    parser:flag("-p --optimize")
+        :description("Enables the optimizer.")
+        :default(config.optimize)
+
+    parser:flag("-q --no-optimize")
+        :description("Disables the optimizer. (disabling might fix issues)")
+        :action(function(x)
+            x.optimize = false
+        end)
+
+    parser:flag("-v --verbose")
+        :default(config.verbose)
+
+    --//TODO: add version flag
+
     args = parser:parse(args)
 
     local current_dir = lfs.currentdir()
@@ -76,6 +78,7 @@ return function(args)
     local pos = reverse:find("/", reverse:find("/", nil, true), true)
     local parent_folder = args.input:sub(0, reverse:len() - pos)
     lfs.chdir(parent_folder)
+    cmake.project_dir = parent_folder
 
     return args
 end

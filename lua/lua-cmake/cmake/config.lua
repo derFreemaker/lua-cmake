@@ -1,7 +1,7 @@
 ---@type lfs
 local lfs = require("lfs")
 local utils = require("lua-cmake.utils")
-local validation = require("lua-cmake.third_party.erento.validation")
+local validation = require("lua-cmake.validation")
 
 ---@class lua-cmake.config
 ---@field config string
@@ -22,21 +22,16 @@ local default_config = {
 }
 local default_config_copy = utils.table.copy(default_config)
 
-local config_scheme = validation.is_table({
-    lua_cmake = validation.optional(
-        validation.is_table({
-            config = validation.optional(
-                validation.is_string()),
-            cmake = validation.optional(
-                validation.is_string()),
-            optimize = validation.optional(
-                validation.is_boolean()),
-            verbose = validation.optional(
-                validation.is_boolean()),
+local config_validator = validation.is_table({
+    lua_cmake = validation.optional.is_table({
+        config = validation.optional.is_string(),
+        cmake = validation.optional.is_string(),
+        optimize = validation.optional.is_boolean(),
+        verbose = validation.optional.is_boolean(),
 
-            plugins = validation.optional(
-                validation.is_array(validation.is_string(), false))
-        }, false))
+        plugins = validation.optional.is_array(
+            validation.is_string()),
+    })
 }, true)
 
 local project_config_file = lfs.currentdir() .. "/.config/luacmake.lua"
@@ -50,22 +45,12 @@ if not success then
     return default_config_copy
 end
 
-local valid, err = config_scheme(config)
+local valid, err = config_validator(config)
 if not valid then
+    ---@cast err -nil
+
     print("lua-cmake: config validation error:")
-
-    local function print_table(t, index)
-        for key, value in pairs(t) do
-            if type(value) == "table" then
-                print_table(value, index .. "." .. tostring(key))
-                goto continue
-            end
-            print(index .. "." .. key .. ": " .. value)
-            ::continue::
-        end
-    end
-    print_table(err, "<config>")
-
+    print(err.to_string())
     print("lua-cmake: ignoring config!")
 
     return default_config_copy

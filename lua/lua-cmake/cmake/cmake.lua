@@ -1,3 +1,7 @@
+-- its important that the config gets loaded before args are parsed
+local config = require("lua-cmake.cmake.config")
+cmake = { config = config }
+
 ---@class lua-cmake.cmake
 ---@field config { lua_cmake: lua-cmake.config } | table
 ---@field args lua-cmake.cmake.args
@@ -6,41 +10,43 @@
 ---
 ---@field registry lua-cmake.dep.registry
 ---@field generator lua-cmake.gen.generator
+---
+---@field project_dir string
 cmake = {
+    config = config,
+    args = require("lua-cmake.cmake.args")({ ... }, config.lua_cmake),
+    path_resolver = require("lua-cmake.filesystem.path_resolver"),
+    registry = require("lua-cmake.dep.registry"),
+    generator = require("lua-cmake.gen.generator"),
+
     targets = {
-        collection = {},
-        cxx = {},
-        imported = {},
+        collection = {
+            objects = require("lua-cmake.target.collection.objects"),
+        },
+        cxx = {
+            executable = require("lua-cmake.target.cxx.executable"),
+            library = require("lua-cmake.target.cxx.library"),
+        },
+        imported = {
+            package = require("lua-cmake.target.imported.package"),
+        },
     },
     project = require("lua-cmake.cmake.project"),
 }
-cmake.config = require("lua-cmake.cmake.config")
-cmake.args = require("lua-cmake.cmake.args")({ ... })
-cmake.path_resolver = require("lua-cmake.filesystem.path_resolver")
-cmake.registry = require("lua-cmake.dep.registry")
-cmake.generator = require("lua-cmake.gen.generator")
 
 --------------
 -- commands --
 --------------
+local function load_command(name)
+    require("lua-cmake.cmake.commands." .. name)
+end
 
-require("lua-cmake.cmake.commands.add_definitions")
-require("lua-cmake.cmake.commands.add_subdirectory")
-require("lua-cmake.cmake.commands.compile_options")
-require("lua-cmake.cmake.commands.if")
-require("lua-cmake.cmake.commands.include_directories")
-require("lua-cmake.cmake.commands.include")
-require("lua-cmake.cmake.commands.set")
-require("lua-cmake.cmake.commands.version")
-require("lua-cmake.cmake.commands.write")
-
--------------
--- targets --
--------------
-
-cmake.targets.collection.objects = require("lua-cmake.target.collection.objects")
-
-cmake.targets.cxx.executable = require("lua-cmake.target.cxx.executable")
-cmake.targets.cxx.library = require("lua-cmake.target.cxx.library")
-
-cmake.targets.imported.package = require("lua-cmake.target.imported.package")
+load_command("add_definitions")
+load_command("add_subdirectory")
+load_command("compile_options")
+load_command("if")
+load_command("include_directories")
+load_command("include")
+load_command("set")
+load_command("version")
+load_command("write")
