@@ -1,5 +1,5 @@
 # lua-cmake
-CMake generator in lua.
+Configure CMake in lua.
 
 ## Get Started
 1. Clone the repo
