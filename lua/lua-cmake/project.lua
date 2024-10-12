@@ -1,23 +1,23 @@
----@class lua-cmake.cmake.project.config
+---@class lua-cmake.project.config
 ---@field name string
 ---@field version { major: integer, minor: integer | nil, patch: integer | nil, tweak: integer } | nil
 ---@field description string | nil
 ---@field homepage_url string | nil
 ---@field languages string[] | nil
 
-local kind = "lua-cmake.cmake.project"
----@class lua-cmake.cmake.project : object
----@field config lua-cmake.cmake.project.config
----@overload fun(config: lua-cmake.cmake.project.config) : lua-cmake.cmake.project
+local kind = "lua-cmake.project"
+---@class lua-cmake.project : object
+---@field config lua-cmake.project.config
+---@overload fun(config: lua-cmake.project.config) : lua-cmake.project
 local project = {}
 
----@param config lua-cmake.cmake.project.config
+---@param config lua-cmake.project.config
 function project:__init(config)
     self.config = config
 
     cmake.generator.add_action({
         kind = kind,
-        ---@param context lua-cmake.cmake.project.config
+        ---@param context lua-cmake.project.config
         func = function(writer, context)
             writer:write("project(", context.name)
 

@@ -1,6 +1,6 @@
 {
     "Lua.diagnostics.globals": [
-        "cmake"
+        "cmake",
     ],
     "Lua.workspace.ignoreDir": [
         ".vscode",

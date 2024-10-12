@@ -1,4 +1,4 @@
----@class lua-cmake.cmake
+---@class lua-cmake
 local cmake = _G.cmake
 
 --//TODO: add detection if variable is used since they can change over time and there for not easily optimized out

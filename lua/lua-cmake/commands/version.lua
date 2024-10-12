@@ -4,7 +4,7 @@ local string_builder = require("lua-cmake.utils.string_builder")
 local min_cmake_version
 local max_cmake_version
 
----@class lua-cmake.cmake
+---@class lua-cmake
 local cmake = _G.cmake
 
 ---@return string | nil

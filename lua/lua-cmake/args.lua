@@ -35,10 +35,10 @@ local function make_path_absolute(path, relative)
     return new_path
 end
 
----@alias lua-cmake.cmake.args { input: string, output: string | nil, optimize: boolean, verbose: boolean }
+---@alias lua-cmake.args { input: string, output: string | nil, optimize: boolean, verbose: boolean }
 ---@param args table
 ---@param config lua-cmake.config
----@return lua-cmake.cmake.args
+---@return lua-cmake.args
 return function(args, config)
     local parser = argparse("lua-cmake", "Used to generate cmake files configured from lua.")
     parser:option("-i --input")

@@ -1,33 +1,48 @@
 ---@type lfs
 local lfs = require("lfs")
-local utils = require("lua-cmake.utils")
+
+---@return "windows" | "linux"
+local function get_os()
+    if package.config:sub(1, 1) == '\\' then
+        return "windows"
+    else
+        return "linux"
+    end
+end
 
 ---@class lua-cmake.filesystem.path_resolver
 local path_resolver = {}
 
 ---@nodiscard
----@param path_str string
+---@param path string
 ---@param absolute boolean | nil default is false
 ---@return string
-function path_resolver.resolve_path(path_str, absolute)
-    local path = utils.path.new(path_str)
+function path_resolver.resolve_path(path, absolute)
+    if (get_os() == "windows" and (path:len() < 2 or path:sub(2, 2) ~= ":"))
+        or (get_os() == "linux" and (path:len() < 1 or path:sub(1, 1) ~= "/")) then
+        local current_dir = lfs.currentdir()
+        if not current_dir then
+            error("unable to get current dir")
+        end
+        current_dir = current_dir:gsub("\\", "/")
 
-    if not path:is_absolute() then
-        local current_dir = lfs.currentdir():gsub("\\", "/")
         if current_dir ~= cmake.project_dir or absolute then
-            path = utils.path.new(current_dir .. "/" .. path:to_string())
+            if path:sub(1, 1) ~= "/" then
+                path = current_dir .. "/" .. path
+            else
+                path = current_dir .. path
+            end
         end
     end
 
-    path_str = path:to_string()
     if not absolute then
-        local pos = path_str:find(cmake.project_dir, nil, true)
+        local pos = path:find(cmake.project_dir, nil, true)
         if pos then
-            path_str = path_str:sub(pos + cmake.project_dir:len() + 1)
+            path = path:sub(pos + cmake.project_dir:len() + 1)
         end
     end
 
-    return path_str
+    return path
 end
 
 ---@param paths string[]

@@ -1,10 +1,9 @@
--- its important that the config gets loaded before args are parsed
-local config = require("lua-cmake.cmake.config")
+local config = require("lua-cmake.config")
 cmake = { config = config }
 
----@class lua-cmake.cmake
+---@class lua-cmake
 ---@field config { lua_cmake: lua-cmake.config } | table
----@field args lua-cmake.cmake.args
+---@field args lua-cmake.args
 ---
 ---@field path_resolver lua-cmake.filesystem.path_resolver
 ---
@@ -13,12 +12,6 @@ cmake = { config = config }
 ---
 ---@field project_dir string
 cmake = {
-    config = config,
-    args = require("lua-cmake.cmake.args")({ ... }, config.lua_cmake),
-    path_resolver = require("lua-cmake.filesystem.path_resolver"),
-    registry = require("lua-cmake.dep.registry"),
-    generator = require("lua-cmake.gen.generator"),
-
     targets = {
         collection = {
             objects = require("lua-cmake.target.collection.objects"),
@@ -31,14 +24,22 @@ cmake = {
             package = require("lua-cmake.target.imported.package"),
         },
     },
-    project = require("lua-cmake.cmake.project"),
+    project = require("lua-cmake.project"),
 }
+
+-- its important that the config gets loaded before args are parsed
+cmake.config = require("lua-cmake.config")
+cmake.args = require("lua-cmake.args")({ ... }, config.lua_cmake)
+
+cmake.path_resolver = require("lua-cmake.filesystem.path_resolver")
+cmake.registry = require("lua-cmake.dep.registry")
+cmake.generator = require("lua-cmake.gen.generator")
 
 --------------
 -- commands --
 --------------
 local function load_command(name)
-    require("lua-cmake.cmake.commands." .. name)
+    require("lua-cmake.commands." .. name)
 end
 
 load_command("add_definitions")

@@ -1,4 +1,4 @@
----@class lua-cmake.cmake
+---@class lua-cmake
 local cmake = _G.cmake
 
 ---@param variable string
