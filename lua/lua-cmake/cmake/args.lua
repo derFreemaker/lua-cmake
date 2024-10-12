@@ -1,5 +1,5 @@
 local lfs = require("lfs")
-local cli_parser = require("lua-cmake.third_party.mpeterv.cli_parser")
+local argparse = require("lua-cmake.third_party.mpeterv.argparse")
 
 ---@return "windows" | "linux"
 local function get_os()
@@ -35,7 +35,7 @@ local function make_path_absolute(path, relative)
     return new_path
 end
 
-local parser = cli_parser("lua-cmake", "Used to generate cmake files configured from lua.")
+local parser = argparse("lua-cmake", "Used to generate cmake files configured from lua.")
 parser:option("-i --input")
     :description("The config file for lua-cmake should run.")
     :default(cmake.config.lua_cmake.config)
@@ -59,7 +59,7 @@ parser:flag("-v --verbose")
 
 --//TODO: add version flag
 
----@alias lua-cmake.cmake.args { input: string, output: string | nil, optimize: boolean }
+---@alias lua-cmake.cmake.args { input: string, output: string | nil, optimize: boolean, verbose: boolean }
 ---@return lua-cmake.cmake.args
 return function(args)
     args = parser:parse(args)

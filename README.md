@@ -22,3 +22,4 @@ The way it works is it generates a cmake file based on the configuration, this m
 ## Third-Party
 - [argparse](https://github.com/mpeterv/argparse)
 - [LuaFileSystem](https://lunarmodules.github.io/luafilesystem)
+- [lua-schema-validation](https://github.com/erento/lua-schema-validation)

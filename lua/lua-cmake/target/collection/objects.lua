@@ -7,14 +7,15 @@ local utils = require("lua-cmake.utils")
 local kind = "lua-cmake.targets.collection.objects"
 ---@class lua-cmake.target.collection.objects : object
 ---@field config lua-cmake.target.collection.objects.config
-local srcs_collection = {}
+---@overload fun(config: lua-cmake.target.collection.objects.config) : lua-cmake.target.collection.objects
+local objects_collection = {}
 
 ---@private
 ---@param config lua-cmake.target.collection.objects.config
-function srcs_collection:__init(config)
+function objects_collection:__init(config)
     self.config = utils.table.readonly(config)
 
-    cmake.path_resolver.resolve_paths(self.config.srcs)
+    cmake.path_resolver.resolve_paths_implace(self.config.srcs)
 
     cmake.registry.add_entry({
         get_name = function()
@@ -33,4 +34,4 @@ function srcs_collection:__init(config)
     })
 end
 
-return class(kind, srcs_collection)
+return class(kind, objects_collection)

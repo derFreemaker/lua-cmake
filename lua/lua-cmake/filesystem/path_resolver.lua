@@ -1,6 +1,6 @@
 ---@type lfs
 local lfs = require("lfs")
-local utils_path = require("lua-cmake.third_party.derFreemaker.utils.bin.path")
+local utils = require("lua-cmake.utils")
 
 local project_dir = lfs.currentdir():gsub("\\", "/")
 if not project_dir then
@@ -13,23 +13,24 @@ local path_resolver = {}
 
 ---@nodiscard
 ---@param path_str string
+---@param absolute boolean | nil default is false
 ---@return string
-function path_resolver.resolve_path(path_str)
-    local path = utils_path.new(path_str)
+function path_resolver.resolve_path(path_str, absolute)
+    local path = utils.path.new(path_str)
 
     if not path:is_absolute() then
         local current_dir = lfs.currentdir():gsub("\\", "/")
-        if current_dir == project_dir then
-            return path_str
+        if current_dir ~= project_dir or absolute then
+            path = utils.path.new(current_dir .. "/" .. path:to_string())
         end
-
-        path = utils_path.new(current_dir .. "/" .. path:to_string())
     end
 
     path_str = path:to_string()
-    local pos = path_str:find(project_dir, nil, true)
-    if pos then
-        path_str = path_str:sub(pos + project_dir_len + 1)
+    if not absolute then
+        local pos = path_str:find(project_dir, nil, true)
+        if pos then
+            path_str = path_str:sub(pos + project_dir_len + 1)
+        end
     end
 
     return path_str
@@ -38,11 +39,18 @@ end
 ---@param paths string[]
 ---@return string[]
 function path_resolver.resolve_paths(paths)
+    local resolved_paths = {}
+    for index, path in ipairs(paths) do
+        resolved_paths[index] = path_resolver.resolve_path(path)
+    end
+    return resolved_paths
+end
+
+---@param paths string[]
+function path_resolver.resolve_paths_implace(paths)
     for index, path in ipairs(paths) do
         paths[index] = path_resolver.resolve_path(path)
     end
-
-    return paths
 end
 
 return path_resolver

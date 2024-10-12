@@ -5,8 +5,10 @@
 ---@field homepage_url string | nil
 ---@field languages string[] | nil
 
+local kind = "lua-cmake.cmake.project"
 ---@class lua-cmake.cmake.project : object
 ---@field config lua-cmake.cmake.project.config
+---@overload fun(config: lua-cmake.cmake.project.config) : lua-cmake.cmake.project
 local project = {}
 
 ---@param config lua-cmake.cmake.project.config
@@ -14,7 +16,7 @@ function project:__init(config)
     self.config = config
 
     cmake.generator.add_action({
-        kind = "lua-cmake.cmake.project",
+        kind = kind,
         ---@param context lua-cmake.cmake.project.config
         func = function(writer, context)
             writer:write("project(", context.name)
@@ -67,4 +69,4 @@ function project:__init(config)
     })
 end
 
-return class("lua-cmake.cmake.project", project)
+return class(kind, project)

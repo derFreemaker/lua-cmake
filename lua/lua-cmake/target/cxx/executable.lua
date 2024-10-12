@@ -27,7 +27,7 @@ function executable:__init(config)
     if not self.config.srcs then
         self.config.srcs = {}
     else
-        cmake.path_resolver.resolve_paths(self.config.srcs)
+        cmake.path_resolver.resolve_paths_implace(self.config.srcs)
     end
 
     if not self.config.options then

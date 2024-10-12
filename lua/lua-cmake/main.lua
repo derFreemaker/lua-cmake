@@ -30,7 +30,17 @@ setup_path()
 ---@type boolean, lfs
 local lfs_status, lfs = pcall(require, "lfs")
 if not lfs_status then
-    error("Failed to load LuaFileSystem library: " .. lfs)
+    error("failed to load LuaFileSystem library: " .. lfs)
+end
+local current_dir = lfs.currentdir()
+if not current_dir then
+    error("was unable to get current dir.")
+end
+
+---@param msg string
+local function error(msg)
+    print("lua-cmake: " .. msg)
+    os.exit(-1)
 end
 
 require("lua-cmake.third_party.derFreemaker.class_system")
@@ -38,22 +48,44 @@ local string_writer = require("lua-cmake.utils.string_writer")
 
 --//? We are loading cmake like this to pass the var args to it.
 loadfile(lua_cmake_dir .. "lua/lua-cmake/cmake/cmake.lua")(...)
+local cmake = cmake
 
 if not lfs.exists(cmake.args.input) then
     error("config file not found: " .. cmake.args.input)
 end
-if cmake.config.lua_cmake.verbose then
+if cmake.args.verbose then
     print("lua-cmake: config file '" .. cmake.args.input .. "'")
+end
+
+for _, plugin_path in pairs(cmake.config.lua_cmake.plugins) do
+    local path = cmake.path_resolver.resolve_path(plugin_path, true)
+    if not lfs.exists(path) then
+        print("lua-cmake: unable to find plugin: " .. path)
+        goto continue
+    end
+
+    local plugin_func, load_msg = loadfile(path)
+    if not plugin_func then
+        error("unable to load plugin file: " .. path .. "\n" .. load_msg)
+    end
+    local plugin_thread = coroutine.create(plugin_func)
+    local success, run_msg = coroutine.resume(plugin_thread)
+    if not success then
+        error("error while executing plugin: " .. path .. "\n" .. debug.traceback(plugin_thread, run_msg))
+    end
+
+    ::continue::
 end
 
 local stopwatch = require("lua-cmake.utils.stopwatch")
 local sw_total = stopwatch()
 sw_total:start()
 
+-- configure
 do
     local config_func, config_err_msg = loadfile(cmake.args.input, "t")
     if not config_func then
-        error("unable to load entry file: '" .. cmake.args.input .. "' \nerror:\n  " .. config_err_msg)
+        error("unable to load entry file: '" .. cmake.args.input .. "'\n" .. config_err_msg)
     end
     local config_thread = coroutine.create(config_func)
     local config_success
@@ -63,8 +95,7 @@ do
 
     config_success, config_err_msg = coroutine.resume(config_thread)
     if not config_success then
-        print("error in config file: " .. config_err_msg .. "\n" .. debug.traceback(config_thread))
-        os.exit(-1)
+        error("error in config file: " .. config_err_msg .. "\n" .. debug.traceback(config_thread))
     end
 
     ---@diagnostic disable-next-line: invisible
@@ -78,9 +109,10 @@ do
 end
 
 if not cmake.get_version() then
-    error("A cmake version is required to be set! cmake.version(...)")
+    error("A minimum cmake version is required to be set! 'cmake.version(...)'")
 end
 
+-- optimize
 if cmake.args.optimize then
     local sw = stopwatch()
     sw:start()
@@ -97,6 +129,7 @@ else
     print("lua-cmake: optimizer disabled")
 end
 
+-- generate
 do
     local sw = stopwatch()
     sw:start()
