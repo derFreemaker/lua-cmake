@@ -63,7 +63,7 @@ end
 for _, plugin_path in pairs(cmake.config.lua_cmake.plugins) do
     local path = cmake.path_resolver.resolve_path(plugin_path, true)
     if not lfs.exists(path) then
-        fatal_error("lua-cmake: unable to find plugin: " .. path)
+        fatal_error("unable to find plugin: " .. path)
     end
 
     local plugin_func, load_msg = loadfile(path)
