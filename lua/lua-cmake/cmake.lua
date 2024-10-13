@@ -1,9 +1,6 @@
-local config = require("lua-cmake.config")
-cmake = { config = config }
-
 ---@class lua-cmake
 ---@field config { lua_cmake: lua-cmake.config } | table
----@field args lua-cmake.args
+---@field args lua-cmake.arguments
 ---
 ---@field path_resolver lua-cmake.filesystem.path_resolver
 ---
@@ -27,9 +24,16 @@ cmake = {
     project = require("lua-cmake.project"),
 }
 
--- its important that the config gets loaded before args are parsed
-cmake.config = require("lua-cmake.config")
-cmake.args = require("lua-cmake.args")({ ... }, config.lua_cmake)
+---@param msg string
+function cmake.fatal_error(msg)
+    print("lua-cmake: " .. msg)
+    os.exit(-1)
+end
+
+local arguments = require("lua-cmake.args")
+local args = arguments.get_args({...})
+cmake.config = require("lua-cmake.config")(args.config)
+cmake.args = arguments.resolve_args(args, cmake.config.lua_cmake)
 
 cmake.path_resolver = require("lua-cmake.filesystem.path_resolver")
 cmake.registry = require("lua-cmake.dep.registry")

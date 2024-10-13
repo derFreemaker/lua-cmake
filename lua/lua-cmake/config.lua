@@ -34,27 +34,27 @@ local config_validator = validation.is_table({
     })
 }, true)
 
-local project_config_file = lfs.currentdir() .. "/.config/luacmake.lua"
-if not lfs.exists(project_config_file) then
+---@param config_path string
+return function(config_path)
+    if not lfs.exists(config_path) then
+        return default_config_copy
+    end
+
+    local config_file_env = _ENV
+    config_file_env.config = default_config_copy
+    local success, config = pcall(function() return loadfile(config_path)() end)
+    if not success then
+        print("lua-cmake: error loading config: " .. config_path)
+        return default_config_copy
+    end
+
+    local valid, err = config_validator(config)
+    if not valid then
+        ---@cast err -nil
+        cmake.fatal_error("config validation error:\n" .. err.to_string())
+        return default_config_copy
+    end
+
+    utils.table.copy_to(config, default_config_copy)
     return default_config_copy
 end
-
-local success, config = pcall(function() return loadfile(project_config_file)() end)
-if not success then
-    print("lua-cmake: error loading config: " .. project_config_file)
-    return default_config_copy
-end
-
-local valid, err = config_validator(config)
-if not valid then
-    ---@cast err -nil
-
-    print("lua-cmake: config validation error:")
-    print(err.to_string())
-    print("lua-cmake: ignoring config!")
-
-    return default_config_copy
-end
-
-utils.table.copy_to(config, default_config_copy)
-return default_config_copy

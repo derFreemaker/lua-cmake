@@ -15,7 +15,7 @@ local path_resolver = {}
 
 ---@nodiscard
 ---@param path string
----@param absolute boolean | nil default is false
+---@param absolute boolean | nil
 ---@return string
 function path_resolver.resolve_path(path, absolute)
     if (get_os() == "windows" and (path:len() < 2 or path:sub(2, 2) ~= ":"))
@@ -46,19 +46,21 @@ function path_resolver.resolve_path(path, absolute)
 end
 
 ---@param paths string[]
+---@param absolute boolean | nil
 ---@return string[]
-function path_resolver.resolve_paths(paths)
+function path_resolver.resolve_paths(paths, absolute)
     local resolved_paths = {}
     for index, path in ipairs(paths) do
-        resolved_paths[index] = path_resolver.resolve_path(path)
+        resolved_paths[index] = path_resolver.resolve_path(path, absolute)
     end
     return resolved_paths
 end
 
 ---@param paths string[]
-function path_resolver.resolve_paths_implace(paths)
+---@param absolute boolean | nil
+function path_resolver.resolve_paths_implace(paths, absolute)
     for index, path in ipairs(paths) do
-        paths[index] = path_resolver.resolve_path(path)
+        paths[index] = path_resolver.resolve_path(path, absolute)
     end
 end
 

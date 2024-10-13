@@ -43,7 +43,6 @@ local function fatal_error(msg)
     os.exit(-1)
 end
 
-
 require("lua-cmake.third_party.derFreemaker.class_system")
 local string_writer = require("lua-cmake.utils.string_writer")
 
@@ -51,7 +50,6 @@ local string_writer = require("lua-cmake.utils.string_writer")
 loadfile(lua_cmake_dir .. "lua/lua-cmake/cmake.lua")(...)
 ---@class lua-cmake
 local cmake = cmake
-cmake.fatal_error = fatal_error
 
 if not lfs.exists(cmake.args.input) then
     fatal_error("config file not found: " .. cmake.args.input)

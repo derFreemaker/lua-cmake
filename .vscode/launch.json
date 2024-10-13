@@ -13,6 +13,7 @@
                 "--optimize",
                 "--output", "test/CMakeLists.txt",
                 "--input", "${workspaceFolder}/test/test.lua",
+                "test"
             ]
         },
         {
@@ -24,6 +25,7 @@
                 "--no-optimize",
                 "--output", "test/CMakeLists.txt",
                 "--input", "${workspaceFolder}/test/test.lua",
+                "test"
             ]
         }
     ]

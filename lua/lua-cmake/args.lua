@@ -14,6 +14,10 @@ end
 ---@param relative string
 ---@return string
 local function make_path_absolute(path, relative)
+    if path == "." then
+        return relative
+    end
+
     local new_path
 
     if get_os() == "windows" then
@@ -21,7 +25,10 @@ local function make_path_absolute(path, relative)
         if str == ":" then
             new_path = path
         else
-            new_path = relative .. "/" .. path
+            if path:sub(1, 1) ~= "/" then
+                path = "/" .. path
+            end
+            new_path = relative .. path
         end
         new_path = new_path:gsub("\\", "/")
     else
@@ -35,50 +42,84 @@ local function make_path_absolute(path, relative)
     return new_path
 end
 
----@alias lua-cmake.args { input: string, output: string | nil, optimize: boolean, verbose: boolean }
----@param args table
+local parser = argparse("lua-cmake", "Used to generate cmake files configured from lua.")
+parser:argument("project_dir")
+    :description("The project dir location.")
+    :default(".")
+    :convert(function(value)
+        return make_path_absolute(value, lfs.currentdir())
+    end)
+
+parser:option("-c --config")
+    :description("The config file path.")
+    :default(".config/luacmake.lua")
+    :convert(function(value)
+        return make_path_absolute(value, lfs.currentdir())
+    end)
+
+parser:option("-i --input")
+    :description("The config file for lua-cmake should run.")
+
+parser:option("-o --output")
+    :description("The output file path in which the generate cmake gets written to.")
+
+parser:flag("-p --optimize")
+    :description("Enables the optimizer.")
+
+parser:flag("-q --no-optimize")
+    :description("Disables the optimizer. (disabling might fix issues)")
+    :action(function(args)
+        args.optimize = false
+    end)
+
+parser:flag("-d --verbose")
+
+parser:flag("-v --version")
+    :action(function()
+        print("lua-cmake version 0.1")
+        os.exit(0)
+    end)
+
+--//TODO: add version flag
+
+---@alias lua-cmake.arguments.raw { project_dir: string, config: string, input: string | nil, output: string | nil, optimize: boolean | nil, verbose: boolean | nil }
+---@alias lua-cmake.arguments { project_dir: string, config: string, input: string, output: string, optimize: boolean, verbose: boolean }
+
+---@class lua-cmake.arguments.lib
+local arguments = {}
+
+---@param args string[]
+---@return lua-cmake.arguments.raw
+function arguments.get_args(args)
+    return parser:parse(args)
+end
+
+---@param args lua-cmake.arguments.raw
 ---@param config lua-cmake.config
----@return lua-cmake.args
-return function(args, config)
-    local parser = argparse("lua-cmake", "Used to generate cmake files configured from lua.")
-    parser:option("-i --input")
-        :description("The config file for lua-cmake should run.")
-        :default(config.config)
+---@return lua-cmake.arguments
+function arguments.resolve_args(args, config)
+    cmake.project_dir = args.project_dir
+    lfs.chdir(args.project_dir)
 
-    parser:option("-o --output")
-        :description("The output file path in which the generate cmake gets written to.")
-        :default(config.cmake)
+    if not args.input then
+        args.input = config.config
+    end
+    args.input = make_path_absolute(args.input, cmake.project_dir)
 
-    parser:flag("-p --optimize")
-        :description("Enables the optimizer.")
-        :default(config.optimize)
+    if not args.output then
+        args.output = config.cmake
+    end
+    args.output = make_path_absolute(args.output, cmake.project_dir)
 
-    parser:flag("-q --no-optimize")
-        :description("Disables the optimizer. (disabling might fix issues)")
-        :action(function(x)
-            x.optimize = false
-        end)
-
-    parser:flag("-v --verbose")
-        :default(config.verbose)
-
-    --//TODO: add version flag
-
-    args = parser:parse(args)
-
-    local current_dir = lfs.currentdir()
-    if not current_dir then
-        error("unable to get current directory")
+    if not args.optimize then
+        args.optimize = config.optimize
+    end
+    if not args.verbose then
+        args.verbose = config.verbose
     end
 
-    args.input = make_path_absolute(args.input, current_dir)
-    args.output = make_path_absolute(args.output, current_dir)
-
-    local reverse = args.input:reverse()
-    local pos = reverse:find("/", reverse:find("/", nil, true), true)
-    local parent_folder = args.input:sub(0, reverse:len() - pos)
-    lfs.chdir(parent_folder)
-    cmake.project_dir = parent_folder
-
+    ---@cast args lua-cmake.arguments
     return args
 end
+
+return arguments
