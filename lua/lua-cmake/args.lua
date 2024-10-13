@@ -99,17 +99,21 @@ end
 ---@return lua-cmake.arguments
 function arguments.resolve_args(args, config)
     cmake.project_dir = args.project_dir
-    lfs.chdir(args.project_dir)
+
+    local current_dir = lfs.currentdir()
+    if not current_dir then
+        cmake.fatal_error("unable to get current working directory")
+    end
 
     if not args.input then
         args.input = config.config
     end
-    args.input = make_path_absolute(args.input, cmake.project_dir)
+    args.input = make_path_absolute(args.input, current_dir)
 
     if not args.output then
         args.output = config.cmake
     end
-    args.output = make_path_absolute(args.output, cmake.project_dir)
+    args.output = make_path_absolute(args.output, current_dir)
 
     if not args.optimize then
         args.optimize = config.optimize
