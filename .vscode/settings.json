@@ -4,6 +4,12 @@
     ],
     "Lua.workspace.ignoreDir": [
         ".vscode",
-        "**/third_party/derFreemaker/utils/src/**/*.lua"
+        "bin",
+    ],
+    "Lua.runtime.path": [
+        "lua/?.lua",
+        
+        // We only add '.so' since lua queries for the right dynamic library it self
+        "lib/?.so"
     ]
 }

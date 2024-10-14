@@ -17,16 +17,19 @@ local function get_os()
     end
 end
 
-local function setup_path(path)
+---@param path string
+---@param package_path string
+---@param package_cpath string
+local function setup_path(path, package_path, package_cpath)
     local dynamic_lib_ext = ".so"
     if get_os() == "windows" then
         dynamic_lib_ext = ".dll"
     end
 
-    package.path = package.path .. ";" .. path .. "lua/?.lua"
-    package.cpath = package.cpath .. ";" .. path .. "lib/?" .. dynamic_lib_ext
+    package.path = package.path .. ";" .. path .. package_path .. "/?.lua"
+    package.cpath = package.cpath .. ";" .. path .. package_cpath .. "/?" .. dynamic_lib_ext
 end
-setup_path(lua_cmake_dir)
+setup_path(lua_cmake_dir, "lua", "lib")
 
 ---@type boolean, lfs
 local lfs_status, lfs = pcall(require, "lfs")
@@ -40,12 +43,13 @@ end
 
 require("lua-cmake.third_party.derFreemaker.class_system")
 local string_writer = require("lua-cmake.utils.string_writer")
+local plugins = require("lua-cmake.plugins")
 
 --//? We are loading cmake like this to pass the varargs to it.
 loadfile(lua_cmake_dir .. "lua/lua-cmake/cmake.lua")(...)
 
 -- change working directory to project_dir
-setup_path(cmake.project_dir)
+setup_path(cmake.project_dir, "", "")
 lfs.chdir(cmake.project_dir)
 
 if not lfs.exists(cmake.args.input) then
@@ -55,30 +59,11 @@ if cmake.args.verbose then
     print("lua-cmake: config file '" .. cmake.args.input .. "'")
 end
 
---//TODO: move into own file
---//TODO: load init.lua if folder is given and add folder to package.path and package.cpath for `require(...)` for loading duration of the package
-for _, plugin_path in pairs(cmake.config.lua_cmake.plugins) do
-    local path = cmake.path_resolver.resolve_path(plugin_path, true)
-    if not lfs.exists(path) then
-        cmake.fatal_error("unable to find plugin: " .. path)
-    end
-
-    local plugin_func, load_msg = loadfile(path)
-    if not plugin_func then
-        cmake.fatal_error("unable to load plugin file: " .. path .. "\n" .. load_msg)
-    end
-    ---@cast plugin_func -nil
-
-    local plugin_thread = coroutine.create(plugin_func)
-    local success, run_msg = coroutine.resume(plugin_thread)
-    if not success then
-        cmake.fatal_error("error while executing plugin: " .. path .. "\n" .. debug.traceback(plugin_thread, run_msg))
-    end
-end
-
 local stopwatch = require("lua-cmake.utils.stopwatch")
 local sw_total = stopwatch()
 sw_total:start()
+
+plugins.load()
 
 -- configure
 do
