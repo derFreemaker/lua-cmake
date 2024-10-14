@@ -17,6 +17,19 @@ function objects_collection:__init(config)
 
     cmake.path_resolver.resolve_paths_implace(self.config.srcs)
 
+    cmake.generator.add_action({
+        kind = kind,
+        ---@param context lua-cmake.target.collection.objects.config
+        func = function(writer, context)
+            writer:write_line("add_library(" .. context.name .. " OBJECT")
+            for _, src in ipairs(context.srcs) do
+                writer:write_indent():write_line("\"" .. src .. "\"")
+            end
+            writer:write_line(")")
+        end,
+        context = self.config
+    })
+
     cmake.registry.add_entry({
         get_name = function()
             return self.config.name
@@ -29,7 +42,7 @@ function objects_collection:__init(config)
         end,
 
         on_dep = function(entry)
-            entry.add_srcs(self.config.srcs)
+            entry.add_links({ self.config.name })
         end,
     })
 end
