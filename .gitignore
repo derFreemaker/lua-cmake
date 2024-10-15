@@ -1,2 +1,5 @@
-# generated output
+# IDE and editor files
+.vscode
+
 test/CMakeLists.txt
+
