@@ -1,3 +1,5 @@
+# NOT FINISHED
+
 # lua-cmake
 Configure CMake in lua.
 
