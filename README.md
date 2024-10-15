@@ -28,6 +28,7 @@ The way it works is it generates a cmake file based on the configuration, this m
 ## Third-Party
 - [argparse](https://github.com/mpeterv/argparse)
 - [lua-filesystem](https://lunarmodules.github.io/luafilesystem)
+- [luasocket](https://github.com/lunarmodules/luasocket)
 
 ## My Libraries
 - [my-utils](https://github.com/derFreemaker/Freemaker.Lua)
