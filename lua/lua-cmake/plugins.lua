@@ -12,7 +12,7 @@ function plugins.load_plugin_directory(path)
     if not lfs.exists(file_path) then
         cmake.fatal_error("unable to find plugin init file: " .. file_path)
     end
-    utils.setup_path(path, "", "")
+    utils.setup_path(path, nil, nil, true)
     plugins.load_plugin_file(file_path)
 end
 
