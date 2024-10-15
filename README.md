@@ -9,7 +9,7 @@ Configure CMake in lua.
 - The env variable is need since lua has no good builtin way to get the current location there for using a env variable was my choice.
 
 ## Usage
-Add a `luacmake.lua` in your repo root and everything can be configured over the `cmake` global.
+Add `luacmake.lua`(default) in your repo root and everything can be configured over the `cmake` global.
 
 For command options use `lua-cmake -h`.
 
