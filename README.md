@@ -1,4 +1,5 @@
-# NOT FINISHED
+# NOT FINISHED & NOT RECOMMENDED.
+Its a personal project there for its not good code or optimized.
 
 # lua-cmake
 Configure CMake in lua.
