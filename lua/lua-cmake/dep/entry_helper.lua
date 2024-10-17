@@ -22,23 +22,11 @@ function entry_helper.check_entry(entry)
         error("entry needs a '<entry>.get_name' function")
     end
 
-    local function entry_error(msg)
-        error("this entry '" .. entry.get_name() .. "' " .. msg, 2)
-    end
-
-    if not entry.add_srcs then
-        entry.add_srcs = function()
-            entry_error("does not support 'add_srcs'")
-        end
-    elseif not type(entry.add_srcs) == "function" then
+    if entry.add_srcs and not type(entry.add_srcs) == "function" then
         error("'<entry>.add_srcs' can only be a function or table or nil")
     end
 
-    if not entry.add_links then
-        entry.add_links = function()
-            entry_error("does not support 'add_links'")
-        end
-    elseif not type(entry.add_links) == "function" then
+    if entry.add_links and not type(entry.add_links) == "function" then
         error("'<entry>.add_links' can only be a function or table or nil")
     end
 
@@ -53,7 +41,15 @@ function entry_helper.resolve_entry(entry)
         for _, dep in ipairs(entry.get_deps()) do
             local dep_entry = cmake.registry.get_entry(dep)
             if not dep_entry then
-                error("unable to find dependency: '" .. dep .. "'")
+                if entry.add_links then
+                    entry.add_links({ dep })
+                else
+                    error("unable to add dependency (" .. dep .. ")"
+                        .. " when not found in registry and entry (" .. entry.get_name() .. ")"
+                        .. " does not support '<entry>.add_links'")
+                end
+
+                goto continue
             end
 
             if not dep_entry.is_resolved then
@@ -64,6 +60,8 @@ function entry_helper.resolve_entry(entry)
                 error("entry does is not support dependency: '" .. dep .. "'")
             end
             dep_entry.on_dep(entry)
+
+            ::continue::
         end
     end
 
