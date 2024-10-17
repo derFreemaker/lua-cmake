@@ -1,6 +1,8 @@
 ---@class lua-cmake
 local cmake = _G.cmake
 
+local kind = "cmake.include"
+
 local global_includes = {}
 ---@param include string
 ---@param optional boolean | nil
@@ -8,7 +10,7 @@ local global_includes = {}
 ---@param no_policy_scope boolean | nil
 function cmake.include(include, optional, result_var, no_policy_scope)
     cmake.generator.add_action({
-        kind = "cmake-include",
+        kind = kind,
         ---@param context { include: string, optional: boolean, result_var: boolean, no_policy_scope: boolean, includes: table<string, true> }
         func = function(builder, context)
             builder:write("include(\"", context.include, "\"")
@@ -39,7 +41,7 @@ function cmake.include(include, optional, result_var, no_policy_scope)
 end
 
 ---@param value lua-cmake.gen.action<{ include: string, optional: boolean, result_var: boolean, no_policy_scope: boolean, includes: table<string, true> }>
-cmake.generator.optimizer.add_strat("cmake-include", function(iter, value)
+cmake.generator.optimizer.add_strat(kind, function(iter, value)
     if value.context.include:find("${") then
         return
     end

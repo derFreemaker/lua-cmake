@@ -1,6 +1,8 @@
 ---@class lua-cmake
 local cmake = _G.cmake
 
+local kind = "cmake.add_definitions"
+
 --//TODO: add detection if variable is used since they can change over time and there for not easily optimized out
 local global_definitions = {}
 ---@param ... { [1]: string, [2]: string | nil }
@@ -11,7 +13,7 @@ function cmake.add_definitions(...)
     end
 
     cmake.generator.add_action({
-        kind = "cmake-add_definitions",
+        kind = kind,
         ---@param context { definitions: { [1]: string, [2]: string | nil }[], global_definitions: table<string, true> }
         func = function(writer, context)
             if #context.definitions == 1 then
@@ -51,7 +53,7 @@ function cmake.add_definition(name, value)
 end
 
 ---@param value lua-cmake.gen.action<{ definitions: { [1]: string, [2]: string | nil }[], global_definitions: table<string, true> }>
-cmake.generator.optimizer.add_strat("cmake-add_definitions", function(iter, value)
+cmake.generator.optimizer.add_strat(kind, function(iter, value)
     local changed = false
 
     for index, definition in ipairs(value.context.definitions) do
@@ -88,7 +90,7 @@ cmake.generator.optimizer.add_strat("cmake-add_definitions", function(iter, valu
 end)
 
 ---@param value lua-cmake.gen.action<{ definitions: { [1]: string, [2]: string | nil }[], global_definitions: table<string, true> }>
-cmake.generator.optimizer.add_strat("cmake-add_definitions", function(iter, value)
+cmake.generator.optimizer.add_strat(kind, function(iter, value)
     while iter:next_is_same() do
         iter:increment()
 

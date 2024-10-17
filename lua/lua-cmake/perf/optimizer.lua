@@ -8,15 +8,15 @@ local optimizer = {
     m_strategies = {}
 }
 
----@param kind_or_kinds string | string[]
+---@param kinds string | string[]
 ---@param strat lua-cmake.perf.strategy<any>
-function optimizer.add_strat(kind_or_kinds, strat)
-    if type(kind_or_kinds) == "string" then
-        kind_or_kinds = { kind_or_kinds }
+function optimizer.add_strat(kinds, strat)
+    if type(kinds) == "string" then
+        kinds = { kinds }
     end
-    ---@cast kind_or_kinds string[]
+    ---@cast kinds string[]
 
-    for _, kind in ipairs(kind_or_kinds) do
+    for _, kind in ipairs(kinds) do
         local kind_strategies = optimizer.m_strategies[kind]
         if not kind_strategies then
             kind_strategies = {}

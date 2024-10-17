@@ -1,12 +1,14 @@
 ---@class lua-cmake
 local cmake = _G.cmake
 
+local kind = "cmake.if_statement"
+
 ---@param condition string
 ---@param body fun()
 ---@return lua-cmake.if.elses
 function cmake._if(condition, body)
     cmake.generator.add_action({
-        kind = "cmake-if_statement",
+        kind = kind,
         ---@param context { condition: string }
         func = function(writer, context)
             writer:write_line("if(", context.condition, ")")
@@ -22,7 +24,7 @@ function cmake._if(condition, body)
     end
 
     local _endif_action = {
-        kind = "cmake-if_statement_end",
+        kind = kind .. "_end",
         func = function(writer)
             writer:write_line("endif()")
         end,
@@ -38,7 +40,7 @@ function cmake._if(condition, body)
     function elses._elseif(elseif_condition, elseif_body)
         cmake.generator.remove_last_action()
         cmake.generator.add_action({
-            kind = "cmake-if_statement_elseif",
+            kind = kind .. "_elseif",
             ---@param context { condition: string }
             func = function(writer, context)
                 writer:write_line("elseif(", context.condition, ")")
@@ -63,7 +65,7 @@ function cmake._if(condition, body)
     function elses._else(else_body)
         cmake.generator.remove_last_action()
         cmake.generator.add_action({
-            kind = "cmake-if_statement_else",
+            kind = kind .. "_else",
             ---@param context { condition: string }
             func = function(writer, context)
                 writer:write_line("else()")
@@ -85,14 +87,14 @@ end
 --//TODO: add optimizer strat that removes the if if there are no actions in it.
 --// can add 'NOT <condition>' to inverse
 ---@param value lua-cmake.gen.action<{ condition: string }>
-cmake.generator.optimizer.add_strat("cmake-if_statement", function(iter, value)
-    if iter:next_is("cmake-if_statement_end") then
+cmake.generator.optimizer.add_strat(kind, function(iter, value)
+    if iter:next_is(kind .. "_end") then
         iter:remove_current()
         iter:remove_next()
         return
     end
 
-    if iter:next_is("cmake-if_statement_else") then
+    if iter:next_is(kind .. "_else") then
         if value.context.condition:sub(1,3) == "NOT" then
             local trim = 4
             if value.context.condition:sub(4, 4) == " " then
@@ -105,7 +107,7 @@ cmake.generator.optimizer.add_strat("cmake-if_statement", function(iter, value)
         iter:remove_next()
     end
 
-    -- if iter:next_is("cmake-if_statement_elseif") then
+    -- if iter:next_is(kind .. "_elseif") then
     --     --//TODO: handle next on is elseif
     -- end
 end)

@@ -29,6 +29,7 @@ local utils = require("lua-cmake.utils")
 ---@field no_cmake_system_package_registry boolean | nil
 ---@field cmake_find_root_path "both" | "only" | "no" | nil
 
+local kind = "cmake.find_package"
 ---@class lua-cmake.imported.package : object
 ---@field private m_config lua-cmake.imported.package.config
 local package = {}
@@ -39,7 +40,7 @@ function package:__init(config)
     self.m_config = config
 
     cmake.generator.add_action({
-        kind = "cmake-find_package",
+        kind = kind,
         ---@param context lua-cmake.imported.package.config
         func = function(writer, context)
             writer:write_line("find_package(", context.name):add_indent()

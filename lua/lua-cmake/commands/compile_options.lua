@@ -1,6 +1,8 @@
 ---@class lua-cmake
 local cmake = _G.cmake
 
+local kind = "cmake.add_compile_options"
+
 --//TODO: add detection if variable is used since they can change over time and there for not easily optimized out
 local global_compile_options = {}
 ---@param ... string
@@ -11,7 +13,7 @@ function cmake.add_compile_options(...)
     end
 
     cmake.generator.add_action({
-        kind = "cmake-add_compile_options",
+        kind = kind,
         ---@param context { options: string[], compile_options: table<string, true> }
         func = function(writer, context)
             writer:write_line("add_compile_options(")
@@ -31,7 +33,7 @@ function cmake.add_compile_options(...)
 end
 
 ---@param value lua-cmake.gen.action<{ options: string[], compile_options: table<string, true> }>
-cmake.generator.optimizer.add_strat("cmake-add_compile_options", function(iter, value)
+cmake.generator.optimizer.add_strat(kind, function(iter, value)
     local changed = false
 
     for index, option in ipairs(value.context.options) do

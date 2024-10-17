@@ -1,6 +1,8 @@
 ---@class lua-cmake
 local cmake = _G.cmake
 
+local kind = "cmake.include_directories"
+
 local global_include_directories = {}
 ---@param ... string
 function cmake.include_directories(...)
@@ -10,7 +12,7 @@ function cmake.include_directories(...)
     end
 
     cmake.generator.add_action({
-        kind = "cmake-include_directories",
+        kind = kind,
         ---@param context { dirs: string[], include_directories: table<string, true> }
         func = function(writer, context)
             if #context.dirs == 1 then
@@ -35,7 +37,7 @@ function cmake.include_directories(...)
 end
 
 ---@param value lua-cmake.gen.action<{ dirs: string[], include_directories: table<string, true> }>
-cmake.generator.optimizer.add_strat("cmake-include_directories", function(iter, value)
+cmake.generator.optimizer.add_strat(kind, function(iter, value)
     local changed = false
 
     for index, dir in ipairs(value.context.dirs) do

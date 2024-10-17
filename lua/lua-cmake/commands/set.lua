@@ -1,6 +1,8 @@
 ---@class lua-cmake
 local cmake = _G.cmake
 
+local kind = "cmake.set"
+
 ---@param variable string
 ---@param value string | boolean
 ---@param parent_scope boolean | nil
@@ -12,7 +14,7 @@ function cmake.set(variable, value, parent_scope)
     end
 
     cmake.generator.add_action({
-        kind = "cmake-set",
+        kind = kind,
         ---@param context { variable: string, value: string, parent_scope: boolean }
         func = function(builder, context)
             builder:write("set(", context.variable, " \"", context.value, "\"")
@@ -29,7 +31,7 @@ function cmake.set(variable, value, parent_scope)
     })
 end
 
-cmake.generator.optimizer.add_strat("cmake-set", function(iter)
+cmake.generator.optimizer.add_strat(kind, function(iter)
     ---@type table<string, integer>
     local t = {}
 
