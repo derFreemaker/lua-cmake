@@ -14,9 +14,16 @@ Add `luacmake.lua`(default) in your repo root and everything can be configured o
 
 For command options use `lua-cmake -h`.
 
-## TODO
-- feature complete
-- tests
+## Config
+`.config/luacmake.lua` is where `lua-cmake` will look for a config.
+As prescribed in [config-dir](https://github.com/pi0/config-dir).
+
+`lua_cmake`
+- `config`: Default entry file for `lua-cmake`.
+- `cmake`: Default output file for `lua-cmake`.
+- `optimize`: Default if optimizer should be enabled.
+- `verbose`: Default if `lua-cmake` should give a verbose output.
+- `plugins`: Plugins that need to be loaded before configuration starts. If one fails or is missing `lua-cmake` will stop the process and report back. A plugin can be a `single file` or a `directory`, if a directory is given it will search for `init.lua` as entry point.
 
 ## Goal
 The goal is to make writing complex system in cmake easier by making you able to configure in lua.
