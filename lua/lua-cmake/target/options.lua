@@ -150,9 +150,9 @@ return function(writer, name, options)
     end
 
     if options.link_libraries and #options.link_libraries ~= 0 then
-        writer:write("target_link_libraries(", name)
+        writer:write_line("target_link_libraries(", name)
         for _, lib in ipairs(options.link_libraries) do
-            writer:write(" ", lib)
+            writer:write_indent():write_line(lib)
         end
         writer:write_line(")")
     end

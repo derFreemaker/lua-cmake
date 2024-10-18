@@ -32,11 +32,13 @@ local utils = require("lua-cmake.utils")
 local kind = "cmake.find_package"
 ---@class lua-cmake.imported.package : object
 ---@field private m_config lua-cmake.imported.package.config
+---@overload fun(config: lua-cmake.imported.package.config, imports: string[] | nil) : lua-cmake.imported.package
 local package = {}
 
 ---@private
 ---@param config lua-cmake.imported.package.config
-function package:__init(config)
+---@param imports string[] | nil
+function package:__init(config, imports)
     self.m_config = config
 
     cmake.generator.add_action({
@@ -187,6 +189,20 @@ function package:__init(config)
         end,
         context = self.m_config
     })
+
+    if imports then
+        for _, import in ipairs(imports) do
+            cmake.registry.add_entry({
+                get_name = function()
+                    return import
+                end,
+
+                on_dep = function(entry)
+                    entry.add_links({ import })
+                end,
+            })
+        end
+    end
 end
 
 return class("lua-cmake.imported.package", package)

@@ -31,7 +31,7 @@ function string_writer:remove_indent(indent)
     return self
 end
 
----@param ... string
+---@param ... any
 ---@return lua-cmake.utils.string_writer
 function string_writer:write(...)
     if self.m_start_of_line then
@@ -40,13 +40,13 @@ function string_writer:write(...)
     end
 
     for _, value in ipairs({ ... }) do
-        self.m_write(value)
+        self.m_write(tostring(value))
     end
 
     return self
 end
 
----@param ... string
+---@param ... any
 ---@return lua-cmake.utils.string_writer
 function string_writer:write_line(...)
     self:write(...)
