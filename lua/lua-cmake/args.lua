@@ -57,7 +57,8 @@ do
         :description("The project dir location.")
         :default(".")
         :convert(function(value)
-            return make_path_absolute(value, current_dir)
+            local project_dir = make_path_absolute(value, current_dir):gsub("\\", "/")
+            return project_dir
         end)
 
     parser:option("-c --config")
@@ -109,7 +110,7 @@ end
 ---@param config lua-cmake.config
 ---@return lua-cmake.arguments
 function arguments.resolve_args(args, config)
-    cmake.project_dir = args.project_dir:gsub("\\", "/")
+    cmake.project_dir = args.project_dir
 
     local current_dir = lfs.currentdir()
     if not current_dir then
