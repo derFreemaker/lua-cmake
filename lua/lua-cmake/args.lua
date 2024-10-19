@@ -109,7 +109,7 @@ end
 ---@param config lua-cmake.config
 ---@return lua-cmake.arguments
 function arguments.resolve_args(args, config)
-    cmake.project_dir = args.project_dir
+    cmake.project_dir = args.project_dir:gsub("\\", "/")
 
     local current_dir = lfs.currentdir()
     if not current_dir then
