@@ -11,6 +11,7 @@
 cmake = {
     targets = {
         collection = {
+            files = require("lua-cmake.target.collection.files"),
             objects = require("lua-cmake.target.collection.objects"),
         },
         cxx = {
@@ -20,6 +21,8 @@ cmake = {
         imported = {
             package = require("lua-cmake.target.imported.package"),
         },
+
+        interface = require("lua-cmake.target.interface"),
     },
     project = require("lua-cmake.project"),
 }
@@ -31,7 +34,7 @@ function cmake.fatal_error(msg)
 end
 
 local arguments = require("lua-cmake.args")
-local args = arguments.get_args({...})
+local args = arguments.get_args({ ... })
 cmake.config = require("lua-cmake.config")(args.config)
 cmake.args = arguments.resolve_args(args, cmake.config.lua_cmake)
 

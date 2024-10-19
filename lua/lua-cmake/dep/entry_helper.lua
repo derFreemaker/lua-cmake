@@ -46,7 +46,7 @@ function entry_helper.resolve_entry(entry)
         for _, dep in ipairs(entry.get_deps()) do
             local dep_entry = cmake.registry.get_entry(dep)
             if not dep_entry then
-                cmake.fatal_error("dependency '" .. dep .. "' not found in registry")
+                cmake.fatal_error("dependency '" .. dep .. "' not found in registry for entry: '" .. entry.get_name() .. "'")
             end
             ---@cast dep_entry -nil
 
@@ -58,8 +58,6 @@ function entry_helper.resolve_entry(entry)
                 error("entry does is not support dependency: '" .. dep .. "'")
             end
             dep_entry.on_dep(entry)
-
-            ::continue::
         end
     end
 

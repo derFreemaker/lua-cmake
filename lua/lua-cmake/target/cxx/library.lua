@@ -1,4 +1,3 @@
-local utils = require("lua-cmake.utils")
 local target_options = require("lua-cmake.target.options")
 
 ---@class lua-cmake.target.cxx.library.config
@@ -23,10 +22,20 @@ local library = {}
 function library:__init(config)
     self.config = config
 
+    if not self.config.hdrs then
+        self.config.hdrs = {}
+    else
+        cmake.path_resolver.resolve_paths_implace(self.config.hdrs)
+    end
+
     if not self.config.srcs then
         self.config.srcs = {}
     else
         cmake.path_resolver.resolve_paths_implace(self.config.srcs)
+    end
+
+    if not self.config.deps then
+        self.config.deps = {}
     end
 
     if not self.config.options then
