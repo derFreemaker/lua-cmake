@@ -44,15 +44,13 @@ return function(config_path)
     config_file_env.config = default_config_copy
     local success, config = pcall(function() return loadfile(config_path)() end)
     if not success then
-        print("lua-cmake: error loading config: " .. config_path)
-        return default_config_copy
+        cmake.fatal_error("loading config: " .. config_path)
     end
 
     local valid, err = config_validator(config)
     if not valid then
         ---@cast err -nil
         cmake.fatal_error("config validation error:\n" .. err.to_string())
-        return default_config_copy
     end
 
     utils.table.copy_to(config, default_config_copy)

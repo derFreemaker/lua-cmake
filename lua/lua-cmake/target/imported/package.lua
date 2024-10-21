@@ -45,7 +45,7 @@ function package:__init(config, imports)
         kind = kind,
         ---@param context lua-cmake.imported.package.config
         func = function(writer, context)
-            writer:write_line("find_package(", context.name):add_indent()
+            writer:write_line("find_package(", context.name):modify_indent(1)
 
             if context.version then
                 writer:write_line(context.version)
@@ -185,7 +185,7 @@ function package:__init(config, imports)
                 end
             end
 
-            writer:remove_indent():write_line(")")
+            writer:modify_indent(-1):write_line(")")
         end,
         context = self.m_config
     })

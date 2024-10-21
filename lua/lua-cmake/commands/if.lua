@@ -16,7 +16,7 @@ function cmake._if(condition, body)
         context = {
             condition = condition
         },
-        add_indent_after = true
+        modify_indent_after = 1
     })
 
     if body then
@@ -28,7 +28,7 @@ function cmake._if(condition, body)
         func = function(writer)
             writer:write_line("endif()")
         end,
-        remove_indent_before = true,
+        modify_indent_before = -1,
     }
     cmake.generator.add_action(_endif_action)
 
@@ -48,8 +48,8 @@ function cmake._if(condition, body)
             context = {
                 condition = elseif_condition
             },
-            remove_indent_before = true,
-            add_indent_after = true,
+            modify_indent_before = -1,
+            modify_indent_after = 1,
         })
 
         if elseif_body then
@@ -70,8 +70,8 @@ function cmake._if(condition, body)
             func = function(writer, context)
                 writer:write_line("else()")
             end,
-            remove_indent_before = true,
-            add_indent_after = true,
+            modify_indent_before = -1,
+            modify_indent_after = 1,
         })
 
         if else_body then

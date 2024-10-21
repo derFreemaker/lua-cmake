@@ -17,7 +17,7 @@ end
 ---@param package_path string | nil
 ---@param package_cpath string | nil
 ---@param front boolean | nil
-function utils.setup_path(path, package_path, package_cpath, front)
+function utils.add_require_path(path, package_path, package_cpath, front)
     package_path = package_path or ""
     package_cpath = package_cpath or ""
 

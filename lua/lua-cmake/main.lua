@@ -42,22 +42,20 @@ if not current_dir then
 end
 
 require("lua-cmake.third_party.derFreemaker.class_system")
+local utils = require("lua-cmake.utils")
 local string_writer = require("lua-cmake.utils.string_writer")
 local plugins = require("lua-cmake.plugins")
 
 --//? We are loading cmake like this to pass the varargs to it.
 loadfile(lua_cmake_dir .. "lua/lua-cmake/cmake.lua")(...)
 
--- change working directory to project_dir
-setup_path(cmake.project_dir, "", "")
-lfs.chdir(cmake.project_dir)
+-- add project_dir path to front of require paths
+utils.add_require_path(cmake.project_dir, "", "", true)
 
 if not lfs.exists(cmake.args.input) then
     cmake.fatal_error("config file not found: " .. cmake.args.input)
 end
-if cmake.args.verbose then
-    print("lua-cmake: config file '" .. cmake.args.input .. "'")
-end
+cmake.log_verbose("config file '" .. cmake.args.input .. "'")
 
 local stopwatch = require("lua-cmake.utils.stopwatch")
 local sw_total = stopwatch()
@@ -87,11 +85,11 @@ do
     ---@diagnostic disable-next-line: invisible
     local has_error = cmake.registry.resolve()
     if has_error then
-        print("lua-cmake: dependencies resolved with error(s) (this probably will corrupt the configuration)")
+        cmake.log("dependencies resolved with error(s) (this probably will corrupt the configuration)")
     end
 
     sw:stop()
-    print("lua-cmake: configured (" .. sw:get_pretty_seconds() .. "s)")
+    cmake.log("configured (" .. sw:get_pretty_seconds() .. "s)")
 end
 
 if not cmake.get_version() then
@@ -106,13 +104,13 @@ if cmake.args.optimize then
     ---@diagnostic disable-next-line: invisible
     local has_error = cmake.generator.optimize()
     if has_error then
-        print("lua-cmake: optimizer finished with error(s) (this probably will corrupt the configuration)")
+        cmake.log("optimizer finished with error(s) (this probably will corrupt the configuration)")
     end
 
     sw:stop()
-    print("lua-cmake: optimized (" .. sw:get_pretty_seconds() .. "s)")
+    cmake.log("optimized (" .. sw:get_pretty_seconds() .. "s)")
 else
-    print("lua-cmake: optimizer disabled")
+    cmake.log("optimizer disabled")
 end
 
 -- generate
@@ -136,15 +134,15 @@ do
     ---@diagnostic disable-next-line: invisible
     local has_error = cmake.generator.generate(writer)
     if has_error then
-        print("lua-cmake: generator finished with error(s)")
+        cmake.log("generator finished with error(s)")
         cmake_file:write("\nmessage(FATAL_ERROR \"lua-cmake generator failed with error(s)\")")
     end
 
     cmake_file:close()
 
     sw:stop()
-    print("lua-cmake: generated (" .. sw:get_pretty_seconds() .. "s)")
+    cmake.log("generated (" .. sw:get_pretty_seconds() .. "s)")
 end
 
 sw_total:stop()
-print("lua-cmake: total " .. sw_total:get_pretty_seconds() .. "s")
+cmake.log("total " .. sw_total:get_pretty_seconds() .. "s")

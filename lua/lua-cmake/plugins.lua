@@ -7,17 +7,6 @@ local plugins = {}
 
 ---@private
 ---@param path string
-function plugins.load_plugin_directory(path)
-    local file_path = path .. "/init.lua"
-    if not lfs.exists(file_path) then
-        cmake.fatal_error("unable to find plugin init file: " .. file_path)
-    end
-    utils.setup_path(path, nil, nil, true)
-    plugins.load_plugin_file(file_path)
-end
-
----@private
----@param path string
 function plugins.load_plugin_file(path)
     local plugin_func, load_msg = loadfile(path)
     if not plugin_func then
@@ -32,6 +21,18 @@ function plugins.load_plugin_file(path)
     end
 end
 
+---@private
+---@param path string
+function plugins.load_plugin_directory(path)
+    local file_path = path .. "/init.lua"
+    if not lfs.exists(file_path) then
+        cmake.fatal_error("unable to find plugin init file: " .. file_path)
+    end
+
+    utils.add_require_path(path, nil, nil, true)
+    plugins.load_plugin_file(file_path)
+end
+
 function plugins.load()
     for _, plugin_path in pairs(cmake.config.lua_cmake.plugins) do
         local path = cmake.path_resolver.resolve_path(plugin_path, true)
@@ -39,11 +40,17 @@ function plugins.load()
             cmake.fatal_error("unable to find plugin: " .. path)
         end
 
+        local package_path = package.path
+        local package_cpath = package.cpath
+
         if lfs.attributes(path).mode == "directory" then
             plugins.load_plugin_directory(path)
         else
             plugins.load_plugin_file(path)
         end
+
+        package.path = package_path
+        package.cpath = package_cpath
     end
 end
 

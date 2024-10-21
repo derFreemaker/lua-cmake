@@ -1,4 +1,4 @@
----@class lua-cmake.gen.action<T> : { kind: string, func: (fun(writer: lua-cmake.utils.string_writer, context: T)), context: T, add_indent_after: boolean | integer | nil, remove_indent_after: boolean | integer | nil, add_indent_before: boolean | integer | nil, remove_indent_before: boolean | integer | nil }
+---@class lua-cmake.gen.action<T> : { kind: string, func: (fun(writer: lua-cmake.utils.string_writer, context: T)), context: T, modify_indent_before: integer | nil, modify_indent_after: integer | nil }
 
 ---@class lua-cmake.gen.generator
 ---@field optimizer lua-cmake.perf.optimizer
@@ -24,41 +24,19 @@ function generator.generate(writer)
     local has_error = false
 
     for index, action in ipairs(generator.m_actions) do
-        if action.add_indent_before then
-            if type(action.add_indent_before) == "number" then
-                writer:add_indent(action.add_indent_before --[[@as integer]])
-            else
-                writer:add_indent()
-            end
-        end
-        if action.remove_indent_before then
-            if type(action.remove_indent_before) == "number" then
-                writer:remove_indent(action.remove_indent_before --[[@as integer]])
-            else
-                writer:remove_indent()
-            end
+        if action.modify_indent_before then
+            writer:modify_indent(action.modify_indent_before --[[@as integer]])
         end
 
         local action_thread = coroutine.create(action.func)
         local success, msg = coroutine.resume(action_thread, writer, action.context)
         if not success then
             has_error = true
-            print("lua-cmake: generator action " .. index .. " failed:\n" .. debug.traceback(action_thread, msg))
+            cmake.error("generator action " .. index .. " failed:\n" .. debug.traceback(action_thread, msg))
         end
 
-        if action.add_indent_after then
-            if type(action.add_indent_after) == "number" then
-                writer:add_indent(action.add_indent_after --[[@as integer]])
-            else
-                writer:add_indent()
-            end
-        end
-        if action.remove_indent_after then
-            if type(action.remove_indent_after) == "number" then
-                writer:remove_indent(action.remove_indent_after --[[@as integer]])
-            else
-                writer:remove_indent()
-            end
+        if action.modify_indent_after then
+            writer:modify_indent(action.modify_indent_after)
         end
     end
 

@@ -40,7 +40,7 @@ function registry.resolve()
             local success, msg = coroutine.resume(entry_thread, entry)
             if not success then
                 has_error = true
-                print("lua-cmake: error when resolving entry '" .. entry.get_name() .. "':\n"
+                cmake.error("when resolving entry '" .. entry.get_name() .. "':\n"
                     .. debug.traceback(entry_thread, msg))
             end
 

@@ -43,7 +43,7 @@ function optimizer.run_strategies(iter, index, kind, strategies)
             local success, msg = coroutine.resume(strat_thread, iter, iter:current())
             if not success then
                 has_error = true
-                print("lua-cmake: optimizer strat for kind: '" .. kind .. "' failed:\n"
+                cmake.error("optimizer strat for kind: '" .. kind .. "' failed:\n"
                     .. debug.traceback(strat_thread, msg))
             end
 
