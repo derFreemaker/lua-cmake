@@ -1,3 +1,5 @@
+local utils = require("lua-cmake.utils")
+
 ---@class lua-cmake.target.interface.config
 ---@field name string
 ---@field hdrs string[] | nil
@@ -44,17 +46,35 @@ function interface:__init(config)
 
         add_hdrs = function(hdrs)
             for _, hdr in ipairs(hdrs) do
+                if utils.table.contains(self.config.hdrs, hdr) then
+                    goto continue
+                end
+
                 table.insert(self.config.hdrs, hdr)
+
+                ::continue::
             end
         end,
         add_srcs = function(srcs)
             for _, src in ipairs(srcs) do
+                if utils.table.contains(self.config.srcs, src) then
+                    goto continue
+                end
+
                 table.insert(self.config.srcs, src)
+
+                ::continue::
             end
         end,
         add_links = function(links)
             for _, link in ipairs(links) do
+                if utils.table.contains(self.links, link) then
+                    goto continue
+                end
+
                 table.insert(self.links, link)
+
+                ::continue::
             end
         end,
 

@@ -48,12 +48,24 @@ function executable:__init(config)
 
         add_srcs = function(srcs)
             for _, src in ipairs(srcs) do
+                if utils.table.contains(self.config.srcs, src) then
+                    goto continue
+                end
+
                 table.insert(self.config.srcs, src)
+
+                ::continue::
             end
         end,
         add_links = function(links)
             for _, link in ipairs(links) do
+                if utils.table.contains(self.config.options.link_libraries, link) then
+                    goto continue
+                end
+
                 table.insert(self.config.options.link_libraries, link)
+
+                ::continue::
             end
         end,
 
@@ -66,7 +78,8 @@ function executable:__init(config)
         kind = kind,
         ---@param context lua-cmake.target.cxx.executable.config
         func = function(writer, context)
-            writer:write_line("add_executable(", context.name)
+            local name = utils.make_name_cmake_conform(context.name)
+            writer:write_line("add_executable(", name)
 
             if context.win32 then
                 writer
@@ -94,6 +107,10 @@ function executable:__init(config)
 
             writer:write_line(")")
 
+            if not utils.is_name_cmake_conform(context.name) then
+                writer:write_line("add_executable(", context.name, " ALIAS ", name, ")")
+            end
+
             cmake.generator.add_action({
                 kind = kind .. ".options",
                 ---@param options_context { name: string, options: lua-cmake.target.options }
@@ -101,7 +118,7 @@ function executable:__init(config)
                     target_options(options_writer, options_context.name, options_context.options)
                 end,
                 context = {
-                    name = context.name,
+                    name = name,
                     options = context.options
                 }
             })

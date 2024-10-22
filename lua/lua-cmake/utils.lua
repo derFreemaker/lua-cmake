@@ -35,4 +35,22 @@ function utils.add_require_path(path, package_path, package_cpath, front)
     end
 end
 
+---@param name string
+---@return boolean
+function utils.is_name_cmake_conform(name)
+    if name:find(":", nil, true) then
+        return false
+    end
+
+    return true
+end
+
+---@param name string
+---@return string
+function utils.make_name_cmake_conform(name)
+    name = name:gsub(":", "_")
+
+    return name
+end
+
 return utils

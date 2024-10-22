@@ -21,11 +21,16 @@ function objects_collection:__init(config)
         kind = kind,
         ---@param context lua-cmake.target.collection.objects.config
         func = function(writer, context)
-            writer:write_line("add_library(" .. context.name .. " OBJECT")
+            local name = utils.make_name_cmake_conform(context.name)
+            writer:write_line("add_library(" .. name .. " OBJECT")
             for _, src in ipairs(context.srcs) do
                 writer:write_indent():write_line("\"" .. src .. "\"")
             end
             writer:write_line(")")
+
+            if not utils.is_name_cmake_conform(context.name) then
+                writer:write_line("add_library(", context.name, " ALIAS ", name, ")")
+            end
         end,
         context = self.config
     })
@@ -37,7 +42,13 @@ function objects_collection:__init(config)
 
         add_srcs = function(srcs)
             for _, src in ipairs(srcs) do
+                if utils.table.contains(self.config.srcs) then
+                    goto continue
+                end
+
                 table.insert(self.config.srcs, src)
+
+                ::continue::
             end
         end,
 
