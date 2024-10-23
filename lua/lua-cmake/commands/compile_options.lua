@@ -20,7 +20,7 @@ function cmake.add_compile_options(...)
             for _, option in ipairs(context.options) do
                 writer
                     :write_indent()
-                    :write_line("\"", option, "\"")
+                    :write_line(option)
             end
             writer:write_line(")")
         end,
