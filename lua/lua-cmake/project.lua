@@ -11,6 +11,7 @@ local kind = "lua-cmake.project"
 ---@overload fun(config: lua-cmake.project.config) : lua-cmake.project
 local project = {}
 
+---@private
 ---@param config lua-cmake.project.config
 function project:__init(config)
     self.config = config
@@ -21,48 +22,44 @@ function project:__init(config)
         func = function(writer, context)
             writer:write("project(", context.name)
 
-            local details = false
-            if context.version then
-                details = true
+            if not context.version
+                and not context.description
+                and not context.homepage_url
+                and not context.languages then
+                writer:write_line(")")
+                return
+            end
+            writer:write_line()
 
-                writer
-                    :write_line()
-                    :write("    VERSION ", context.version.major)
-                    :write(".", context.version.minor or 0)
-                    :write(".", context.version.patch or 0)
-                    :write(".", context.version.tweak or 0)
+            if context.version then
+                writer:write_indent()
+                    :write_line("VERSION ", context.version.major, ".", context.version.minor or 0, ".", context.version.patch or 0, ".", context.version.tweak or 0)
             end
 
             if context.description then
-                details = true
-
-                writer
-                    :write_line()
-                    :write("    DESCRIPTION \"", context.description, "\"")
+                writer:write_indent()
+                    :write_line("DESCRIPTION \"", context.description, "\"")
             end
 
             if context.homepage_url then
-                details = true
-
-                writer
-                    :write_line()
-                    :write("    HOMEPAGE_URL \"", context.homepage_url, "\"")
+                writer:write_indent()
+                    :write_line("HOMEPAGE_URL \"", context.homepage_url, "\"")
             end
 
             if context.languages then
-                details = true
+                writer:write_indent()
+                    :write("LANGUAGES")
 
-                writer
-                    :write_line()
-                    :write("    LANGUAGES")
-                for _, lang in ipairs(context.languages) do
-                    writer:write(" ", lang)
+                if #context.languages == 1 then
+                    writer:write_line(" ", context.languages[1])
+                else
+                    writer:write_line()
+                    for _, lang in ipairs(context.languages) do
+                        writer:write_indent(2):write_line(lang)
+                    end
                 end
             end
 
-            if details then
-                writer:write_line()
-            end
             writer:write_line(")")
         end,
         context = self.config

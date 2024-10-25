@@ -24,8 +24,7 @@ cmake = {
         },
 
         interface = require("lua-cmake.target.interface"),
-    },
-    project = require("lua-cmake.project"),
+    }
 }
 
 ---@param msg string
@@ -78,3 +77,4 @@ load_command("include")
 load_command("set")
 load_command("version")
 load_command("write")
+load_command("project")

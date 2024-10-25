@@ -16,7 +16,7 @@ function cmake.include_directories(...)
         ---@param context { dirs: string[], include_directories: table<string, true> }
         func = function(writer, context)
             if #context.dirs == 1 then
-                writer:write_line("include_directories(\"", context.dirs[1], "\")")
+                writer:write_line("include_directories(", context.dirs[1], ")")
                 return
             end
 
@@ -24,7 +24,7 @@ function cmake.include_directories(...)
             for _, dir in ipairs(context.dirs) do
                 writer
                     :write_indent()
-                    :write_line("\"", dir, "\"")
+                    :write_line(dir)
             end
             writer:write_line(")")
         end,

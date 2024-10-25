@@ -17,7 +17,7 @@ function cmake.set(variable, value, parent_scope)
         kind = kind,
         ---@param context { variable: string, value: string, parent_scope: boolean }
         func = function(builder, context)
-            builder:write("set(", context.variable, " \"", context.value, "\"")
+            builder:write("set(", context.variable, " ", context.value)
             if context.parent_scope then
                 builder:write(" PARENT_SCOPE")
             end

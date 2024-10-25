@@ -3,7 +3,6 @@ local cmake = _G.cmake
 
 local kind = "cmake.add_definitions"
 
---//TODO: add detection if variable is used since they can change over time and there for not easily optimized out
 local global_definitions = {}
 ---@param ... { [1]: string, [2]: string | nil }
 function cmake.add_definitions(...)
@@ -17,7 +16,7 @@ function cmake.add_definitions(...)
         ---@param context { definitions: { [1]: string, [2]: string | nil }[], global_definitions: table<string, true> }
         func = function(writer, context)
             if #context.definitions == 1 then
-                writer:write("add_definitions(-D", definitions[1][1])
+                writer:write("add_definitions(", definitions[1][1])
                 if definitions[1][2] then
                     writer:write("=", definitions[1][2])
                 end
@@ -27,13 +26,13 @@ function cmake.add_definitions(...)
                 for _, definition in ipairs(context.definitions) do
                     writer
                         :write_indent()
-                        :write("-D", definition[1])
+                        :write(definition[1])
 
                     if definition[2] then
                         writer:write("=", definition[2])
                     end
 
-                    writer:write_line("")
+                    writer:write_line()
                 end
                 writer:write_line(")")
             end
