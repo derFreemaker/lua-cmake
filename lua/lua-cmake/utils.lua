@@ -38,6 +38,10 @@ end
 ---@param name string
 ---@return boolean
 function utils.is_name_cmake_conform(name)
+    if name:find(".", nil, true) then
+        return false
+    end
+
     if name:find(":", nil, true) then
         return false
     end
@@ -48,7 +52,8 @@ end
 ---@param name string
 ---@return string
 function utils.make_name_cmake_conform(name)
-    name = name:gsub(":", "_")
+    name = table.concat(utils.string.split(name, ".", true), "_")
+    name = table.concat(utils.string.split(name, ":", true), "_")
 
     return name
 end

@@ -1,28 +1,34 @@
 local utils = require("lua-cmake.utils")
 local target_options = require("lua-cmake.target.options")
 
----@class lua-cmake.target.cxx.executable.config
+---@class lua-cmake.target.cxx.library.config
 ---@field name string
 ---@field srcs string[] | nil
 ---@field hdrs string[] | nil
----@field deps string[] | nil
----@field win32 boolean | nil
----@field macosx_bundle boolean | nil
+---@field type "static" | "shared" | "module" | nil
 ---@field exclude_from_all boolean | nil
 ---@field options lua-cmake.target.options | nil
+---
+---@field deps string[] | nil
 
-local kind = "lua-cmake.target.cxx.executable"
----@class lua-cmake.target.cxx.executable : object
----@field config lua-cmake.target.cxx.executable.config
----@overload fun(config: lua-cmake.target.cxx.executable.config) : lua-cmake.target.cxx.executable
-local executable = {}
+local kind = "lua-cmake.target.cxx.library"
+---@class lua-cmake.target.cxx.library : object
+---@field config lua-cmake.target.cxx.library.config
+---@overload fun(config: lua-cmake.target.cxx.library.config) : lua-cmake.target.cxx.library
+local library = {}
 
----@alias lua-cmake.target.cxx.executable.constructor fun(config: lua-cmake.target.cxx.executable.config)
+---@alias lua-cmake.target.cxx.library.constructor fun(config: lua-cmake.target.cxx.library.config)
 
 ---@private
----@param config lua-cmake.target.cxx.executable.config
-function executable:__init(config)
+---@param config lua-cmake.target.cxx.library.config
+function library:__init(config)
     self.config = config
+
+    if not self.config.hdrs then
+        self.config.hdrs = {}
+    else
+        cmake.path_resolver.resolve_paths_implace(self.config.hdrs)
+    end
 
     if not self.config.srcs then
         self.config.srcs = {}
@@ -30,15 +36,22 @@ function executable:__init(config)
         cmake.path_resolver.resolve_paths_implace(self.config.srcs)
     end
 
+    if not self.config.deps then
+        self.config.deps = {}
+    end
+
     if not self.config.options then
         self.config.options = {}
     end
-    if not self.config.options.link_libraries then
-        self.config.options.link_libraries = {}
+
+    if self.config.options.precompile_headers then
+        for _, hdr_group in ipairs(self.config.options.precompile_headers) do
+            cmake.path_resolver.resolve_paths_implace(hdr_group)
+        end
     end
 
-    if not self.config.deps then
-        self.config.deps = {}
+    if not self.config.options.link_libraries then
+        self.config.options.link_libraries = {}
     end
 
     cmake.registry.add_entry({
@@ -46,6 +59,17 @@ function executable:__init(config)
             return self.config.name
         end,
 
+        add_hdrs = function(hdrs)
+            for _, hdr in ipairs(hdrs) do
+                if utils.table.contains(self.config.hdrs, hdr) then
+                    goto continue
+                end
+
+                table.insert(self.config.hdrs, hdr)
+
+                ::continue::
+            end
+        end,
         add_srcs = function(srcs)
             for _, src in ipairs(srcs) do
                 if utils.table.contains(self.config.srcs, src) then
@@ -72,31 +96,34 @@ function executable:__init(config)
         get_deps = function()
             return self.config.deps
         end,
+
+        on_dep = function(entry)
+            entry.add_links({ self.config.name })
+        end,
     })
 
     cmake.generator.add_action({
         kind = kind,
-        ---@param context lua-cmake.target.cxx.executable.config
+        ---@param context lua-cmake.target.cxx.library.config
         func = function(writer, context)
             local name = utils.make_name_cmake_conform(context.name)
-            writer:write_line("add_executable(", name)
-
-            if context.win32 then
+            writer:write_line("add_library(", name)
+            if context.type then
                 writer
                     :write_indent()
-                    :write_line("WIN32_EXECUTABLE")
-            end
-
-            if context.macosx_bundle then
-                writer
-                    :write_indent()
-                    :write_line("MACOSX_BUNDLE")
+                    :write_line(context.type:upper())
             end
 
             if context.exclude_from_all then
                 writer
                     :write_indent()
                     :write_line("EXCLUDE_FROM_ALL")
+            end
+
+            for _, hdr in ipairs(context.hdrs) do
+                writer
+                    :write_indent()
+                    :write_line("\"", hdr, "\"")
             end
 
             for _, src in ipairs(context.srcs) do
@@ -108,7 +135,7 @@ function executable:__init(config)
             writer:write_line(")")
 
             if not utils.is_name_cmake_conform(context.name) then
-                writer:write_line("add_executable(", context.name, " ALIAS ", name, ")")
+                writer:write_line("add_library(", context.name, " ALIAS ", name, ")")
             end
 
             cmake.generator.add_action({
@@ -127,4 +154,4 @@ function executable:__init(config)
     })
 end
 
-return class(kind, executable)
+return class(kind, library)

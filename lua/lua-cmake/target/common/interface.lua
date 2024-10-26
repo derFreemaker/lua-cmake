@@ -1,9 +1,13 @@
 local utils = require("lua-cmake.utils")
+local target_options = require("lua-cmake.target.options")
 
 ---@class lua-cmake.target.interface.config
 ---@field name string
 ---@field hdrs string[] | nil
 ---@field srcs string[] | nil
+---@field exclude_from_all boolean | nil
+---@field options lua-cmake.target.options | nil
+---
 ---@field deps string[] | nil
 
 local kind = "lua-cmake.target.interface"
@@ -29,6 +33,16 @@ function interface:__init(config)
         cmake.path_resolver.resolve_paths_implace(self.config.srcs)
     else
         self.config.srcs = {}
+    end
+
+    if not self.config.options then
+        self.config.options = {}
+    end
+
+    if self.config.options.precompile_headers then
+        for _, hdr_group in ipairs(self.config.options.precompile_headers) do
+            cmake.path_resolver.resolve_paths_implace(hdr_group)
+        end
     end
 
     if not self.config.deps then
@@ -79,18 +93,52 @@ function interface:__init(config)
         end,
 
         on_dep = function(entry)
-            if entry.add_hdrs then
-                entry.add_hdrs(self.config.hdrs)
-            end
-
-            if entry.add_srcs then
-                entry.add_srcs(self.config.srcs)
-            end
-
-            if entry.add_links then
-                entry.add_links(self.links)
-            end
+            entry.add_links({ self.config.name })
         end
+    })
+
+    cmake.generator.add_action({
+        kind = kind,
+        ---@param context lua-cmake.target.interface.config
+        func = function(writer, context)
+            local name = utils.make_name_cmake_conform(context.name)
+            writer:write_line("add_library(", name, " INTERFACE")
+
+            if context.exclude_from_all then
+                writer
+                    :write_indent()
+                    :write_line("EXCLUDE_FROM_ALL")
+            end
+
+            for _, hdr in ipairs(context.hdrs) do
+                writer:write_indent()
+                    :write_line("\"", hdr, "\"")
+            end
+
+            for _, src in ipairs(context.srcs) do
+                writer:write_indent()
+                    :write_line("\"", src, "\"")
+            end
+
+            writer:write_line(")")
+
+            if not utils.is_name_cmake_conform(context.name) then
+                writer:write_line("add_library(", context.name, " ALIAS ", name, ")")
+            end
+
+            cmake.generator.add_action({
+                kind = kind .. ".options",
+                ---@param options_context { name: string, options: lua-cmake.target.options }
+                func = function(options_writer, options_context)
+                    target_options(options_writer, options_context.name, options_context.options, true)
+                end,
+                context = {
+                    name = name,
+                    options = context.options
+                }
+            })
+        end,
+        context = self.config
     })
 end
 

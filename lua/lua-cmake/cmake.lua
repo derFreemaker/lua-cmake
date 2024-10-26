@@ -15,16 +15,15 @@ cmake = {
             files = require("lua-cmake.target.collection.files"),
             objects = require("lua-cmake.target.collection.objects"),
         },
-        cxx = {
-            executable = require("lua-cmake.target.cxx.executable"),
-            library = require("lua-cmake.target.cxx.library"),
+        common = {
+            interface = require("lua-cmake.target.common.interface"),
+            library = require("lua-cmake.target.common.library"),
+            executable = require("lua-cmake.target.common.executable"),
         },
         imported = {
             package = require("lua-cmake.target.imported.package"),
         },
-
-        interface = require("lua-cmake.target.interface"),
-    }
+    },
 }
 
 ---@param msg string
