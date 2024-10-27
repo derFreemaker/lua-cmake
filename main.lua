@@ -34,7 +34,7 @@ setup_path(".", "", "")
 setup_path(lua_cmake_dir, "lua", "lib")
 
 do
-    local version = require("version.lua")
+    local version = require("version")
     print("lua-cmake version " .. version)
 end
 
