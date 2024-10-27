@@ -11,7 +11,7 @@ The way it works is it generates a cmake file based on the configuration, this m
 ## Get Started
 1. Clone the repo
 2. Set `LUA_CMAKE_DIR` env variable to `{your_repo_path}`
-- The env variable is need since lua has no good builtin way to get the current location there for using a env variable was my choice.
+- The env variable is need since lua has no good builtin way to get the location of the current running script there for using a env variable was my choice.
 
 ## Usage
 Add `luacmake.lua`(default) in your repo root and everything can be configured over the `cmake` global.
