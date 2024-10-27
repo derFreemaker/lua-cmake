@@ -1,7 +1,7 @@
 local lua_cmake_dir = os.getenv("LUA_CMAKE_DIR")
 if lua_cmake_dir == nil then
     print(
-    "lua-cmake: LUA_CMAKE_DIR env variable not defined.\nhelp: https://github.com/derFreemaker/lua-cmake?tab=readme-ov-file#get-started")
+        "lua-cmake: LUA_CMAKE_DIR env variable not defined.\nhelp: https://github.com/derFreemaker/lua-cmake?tab=readme-ov-file#get-started")
     os.exit(-1)
 end
 lua_cmake_dir = lua_cmake_dir:gsub("\\", "/")
@@ -30,13 +30,10 @@ local function setup_path(path, package_path, package_cpath)
     package.path = package.path .. ";" .. path .. package_path .. "/?.lua"
     package.cpath = package.cpath .. ";" .. path .. package_cpath .. "/?" .. dynamic_lib_ext
 end
-setup_path(".", "", "")
 setup_path(lua_cmake_dir, "lua", "lib")
 
-do
-    local version = require("version")
-    print("lua-cmake version " .. version)
-end
+local version = loadfile(lua_cmake_dir .. "version.lua")()
+print("lua-cmake version " .. version)
 
 ---@type boolean, lfs
 local lfs_status, lfs = pcall(require, "lfs")
