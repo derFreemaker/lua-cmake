@@ -29,8 +29,7 @@ local config_validator = validation.is_table({
         optimize = validation.optional.is_boolean(),
         verbose = validation.optional.is_boolean(),
 
-        plugins = validation.optional.is_array(
-            validation.is_string()),
+        plugins = validation.optional.is_array(validation.is_string()),
     })
 }, true)
 
@@ -47,7 +46,7 @@ return function(config_path)
         cmake.fatal_error("loading config: " .. config_path)
     end
 
-    local valid, err = config_validator(config)
+    local valid, err = config_validator:validate(config)
     if not valid then
         ---@cast err -nil
         cmake.fatal_error("config validation error:\n" .. err.to_string())
