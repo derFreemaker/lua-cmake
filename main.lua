@@ -30,7 +30,13 @@ local function setup_path(path, package_path, package_cpath)
     package.path = package.path .. ";" .. path .. package_path .. "/?.lua"
     package.cpath = package.cpath .. ";" .. path .. package_cpath .. "/?" .. dynamic_lib_ext
 end
+setup_path(".", "", "")
 setup_path(lua_cmake_dir, "lua", "lib")
+
+do
+    local version = require("version.lua")
+    print("lua-cmake version " .. version)
+end
 
 ---@type boolean, lfs
 local lfs_status, lfs = pcall(require, "lfs")

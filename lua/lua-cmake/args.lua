@@ -87,9 +87,9 @@ do
 
     parser:flag("-f --force")
 
-    print("lua-cmake version 0.1")
     parser:flag("-v --version")
         :action(function()
+            -- We print the version at the start of main
             os.exit(0)
         end)
 end
