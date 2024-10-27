@@ -1,4 +1,6 @@
----@class lua-cmake.gen.action<T> : { kind: string, func: (fun(writer: lua-cmake.utils.string_writer, context: T)), context: T, modify_indent_before: integer | nil, modify_indent_after: integer | nil }
+local string_builder = require("lua-cmake.utils.string_builder")
+
+---@class lua-cmake.gen.action<T> : { kind: string, func: (fun(writer: lua-cmake.utils.string_builder, context: T)), context: T, modify_indent_before: integer | nil, modify_indent_after: integer | nil }
 
 ---@class lua-cmake.gen.generator
 ---@field optimizer lua-cmake.perf.optimizer
@@ -28,11 +30,16 @@ function generator.generate(writer)
             writer:modify_indent(action.modify_indent_before --[[@as integer]])
         end
 
+        local action_builder = string_builder()
+        action_builder:modify_indent(writer:get_indent())
+
         local action_thread = coroutine.create(action.func)
-        local success, msg = coroutine.resume(action_thread, writer, action.context)
+        local success, msg = coroutine.resume(action_thread, action_builder, action.context)
         if not success then
             has_error = true
             cmake.error("generator action " .. index .. " failed:\n" .. debug.traceback(action_thread, msg))
+        else
+            writer:write_direct(action_builder:build())
         end
 
         if action.modify_indent_after then

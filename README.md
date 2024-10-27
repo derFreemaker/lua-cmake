@@ -1,4 +1,4 @@
-# NOT FINISHED & NOT RECOMMENDED.
+# NOT FINISHED & NOT RECOMMENDED
 Its a personal project there for its not good code or optimized.
 
 # lua-cmake
@@ -37,7 +37,6 @@ As prescribed in [config-dir](https://github.com/pi0/config-dir).
 ## Third-Party
 - [argparse](https://github.com/mpeterv/argparse)
 - [lua-filesystem](https://lunarmodules.github.io/luafilesystem)
-- [luasocket](https://github.com/lunarmodules/luasocket)
 
 ## My Libraries
 - [my-utils](https://github.com/derFreemaker/Freemaker.Lua)

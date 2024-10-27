@@ -3,7 +3,6 @@ local cmake = _G.cmake
 
 local kind = "cmake.add_compile_options"
 
---//TODO: add detection if variable is used since they can change over time and there for not easily optimized out
 local global_compile_options = {}
 ---@param ... string
 function cmake.add_compile_options(...)
@@ -15,14 +14,13 @@ function cmake.add_compile_options(...)
     cmake.generator.add_action({
         kind = kind,
         ---@param context { options: string[], compile_options: table<string, true> }
-        func = function(writer, context)
-            writer:write_line("add_compile_options(")
+        func = function(builder, context)
+            builder:append_line("add_compile_options(")
             for _, option in ipairs(context.options) do
-                writer
-                    :write_indent()
-                    :write_line(option)
+                builder:append_indent()
+                    :append_line(option)
             end
-            writer:write_line(")")
+            builder:append_line(")")
         end,
         context = {
             options = options,

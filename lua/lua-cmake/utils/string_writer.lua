@@ -15,12 +15,35 @@ function string_writer:__init(write)
     self.m_start_of_line = true
 end
 
+---@return integer
+function string_writer:get_indent()
+    return self.m_indent
+end
+
+---@param indent integer
+---@return lua-cmake.utils.string_writer
+function string_writer:set_indent(indent)
+    self.m_indent = indent
+
+    return self
+end
+
 ---@param indent integer | nil
 ---@return lua-cmake.utils.string_writer
 function string_writer:modify_indent(indent)
     self.m_indent = self.m_indent + (indent or 1)
+    if self.m_indent < 0 then
+        self.m_indent = 0
+    end
 
     return self
+end
+
+---@param ... any
+function string_writer:write_direct(...)
+    for _, value in ipairs({ ... }) do
+        self.m_write(tostring(value))
+    end
 end
 
 ---@param ... any
@@ -31,10 +54,7 @@ function string_writer:write(...)
         self:write_indent(self.m_indent)
     end
 
-    for _, value in ipairs({ ... }) do
-        self.m_write(tostring(value))
-    end
-
+    self:write_direct(...)
     return self
 end
 

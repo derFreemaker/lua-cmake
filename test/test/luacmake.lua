@@ -1,4 +1,4 @@
-cmake.targets.cxx.executable({
+cmake.targets.common.executable({
     name = "test_exe",
     srcs = {
         "test.cpp",

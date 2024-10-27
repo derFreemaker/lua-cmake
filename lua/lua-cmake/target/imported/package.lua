@@ -44,148 +44,157 @@ function package:__init(config, imports)
     cmake.generator.add_action({
         kind = kind,
         ---@param context lua-cmake.imported.package.config
-        func = function(writer, context)
-            writer:write_line("find_package(", context.name):modify_indent(1)
+        func = function(builder, context)
+            builder:append_line("find_package(", context.name)
+                :modify_indent(1)
 
             if context.version then
-                writer:write_line(context.version)
+                builder:append_line(context.version)
             end
 
             if context.exact then
-                writer:write_line("EXACT")
+                builder:append_line("EXACT")
             end
 
             if context.quiet then
-                writer:write_line("QUIET")
+                builder:append_line("QUIET")
             end
 
             if context.required then
-                writer:write_line("REQUIRED")
+                builder:append_line("REQUIRED")
             end
 
             if context.components and #context.components > 0 then
-                writer:write_line("COMPONENTS")
+                builder:append_line("COMPONENTS")
 
                 for _, value in ipairs(context.components) do
-                    writer:write_indent():write_line("\"", value, "\"")
+                    builder:append_indent()
+                        :append_line("\"", value, "\"")
                 end
             end
 
             if context.optional_components and #context.optional_components > 0 then
-                writer:write_line("OPTIONAL_COMPONENTS")
+                builder:append_line("OPTIONAL_COMPONENTS")
 
                 for _, value in ipairs(context.optional_components) do
-                    writer:write_indent():write_line("\"", value, "\"")
+                    builder:append_indent()
+                        :append_line("\"", value, "\"")
                 end
             end
 
             if context.search_mode then
-                writer:write_line(context.search_mode:upper())
+                builder:append_line(context.search_mode:upper())
             end
 
             if context.global then
-                writer:write_line("GLOBAL")
+                builder:append_line("GLOBAL")
             end
 
             if context.no_policy_scope then
-                writer:write_line("NO_POLICY_SCOPE")
+                builder:append_line("NO_POLICY_SCOPE")
             end
 
             if context.bypass_provider then
-                writer:write_line("BYPASS_PROVIDER")
+                builder:append_line("BYPASS_PROVIDER")
             end
 
             if context.names and #context.names > 0 then
-                writer:write_line("NAMES")
+                builder:append_line("NAMES")
 
                 for _, value in ipairs(context.names) do
-                    writer:write_indent():write_line("\"", value, "\"")
+                    builder:append_indent()
+                        :append_line("\"", value, "\"")
                 end
             end
 
             if context.configs and #context.configs > 0 then
-                writer:write_line("CONFIGS")
+                builder:append_line("CONFIGS")
 
                 for _, value in ipairs(context.configs) do
-                    writer:write_indent():write_line("\"", value, "\"")
+                    builder:append_indent()
+                        :append_line("\"", value, "\"")
                 end
             end
 
             if context.hints and #context.hints > 0 then
-                writer:write_line("HINTS")
+                builder:append_line("HINTS")
 
                 for _, value in ipairs(context.hints) do
-                    writer:write_indent():write_line("\"", value, "\"")
+                    builder:append_indent()
+                        :append_line("\"", value, "\"")
                 end
             end
 
             if context.paths and #context.paths > 0 then
-                writer:write_line("PATHS")
+                builder:append_line("PATHS")
 
                 for _, value in ipairs(context.paths) do
-                    writer:write_indent():write_line("\"", value, "\"")
+                    builder:append_indent()
+                        :append_line("\"", value, "\"")
                 end
             end
 
             if context.registry_view then
-                writer:write_line("REGISTRY_VIEW ", context.registry_view:upper())
+                builder:append_line("REGISTRY_VIEW ", context.registry_view:upper())
             end
 
             if context.path_suffixes and #context.path_suffixes > 0 then
-                writer:write_line("PATH_SUFFIXES")
+                builder:append_line("PATH_SUFFIXES")
 
                 for _, value in ipairs(context.path_suffixes) do
-                    writer:write_indent():write_line("\"", value, "\"")
+                    builder:append_indent()
+                        :append_line("\"", value, "\"")
                 end
             end
 
             if context.no_default_path then
-                writer:write_line("NO_DEFAULT_PATH")
+                builder:append_line("NO_DEFAULT_PATH")
             end
 
             if context.no_package_root_path then
-                writer:write_line("NO_PACKAGE_ROOT_PATH")
+                builder:append_line("NO_PACKAGE_ROOT_PATH")
             end
 
             if context.no_cmake_path then
-                writer:write_line("NO_CMAKE_PATH")
+                builder:append_line("NO_CMAKE_PATH")
             end
 
             if context.no_cmake_environment_path then
-                writer:write_line("NO_CMAKE_ENVIRONMENT_PATH")
+                builder:append_line("NO_CMAKE_ENVIRONMENT_PATH")
             end
 
             if context.no_system_environment_path then
-                writer:write_line("NO_SYSTEM_ENVIRONMENT_PATH")
+                builder:append_line("NO_SYSTEM_ENVIRONMENT_PATH")
             end
 
             if context.no_cmake_package_registry then
-                writer:write_line("NO_CMAKE_PACKAGE_REGISTRY")
+                builder:append_line("NO_CMAKE_PACKAGE_REGISTRY")
             end
 
             if context.no_cmake_system_path then
-                writer:write_line("NO_CMAKE_SYSTEM_PATH")
+                builder:append_line("NO_CMAKE_SYSTEM_PATH")
             end
 
             if context.no_cmake_install_prefix then
-                writer:write_line("NO_CMAKE_INSTALL_PREFIX")
+                builder:append_line("NO_CMAKE_INSTALL_PREFIX")
             end
 
             if context.no_cmake_system_package_registry then
-                writer:write_line("NO_CMAKE_SYSTEM_PACKAGE_REGISTRY")
+                builder:append_line("NO_CMAKE_SYSTEM_PACKAGE_REGISTRY")
             end
 
             if context.cmake_find_root_path then
                 if context.cmake_find_root_path == "both" then
-                    writer:write_line("CMAKE_FIND_ROOT_PATH_BOTH")
+                    builder:append_line("CMAKE_FIND_ROOT_PATH_BOTH")
                 elseif context.cmake_find_root_path == "only" then
-                    writer:write_line("ONLY_CMAKE_FIND_ROOT_PATH")
+                    builder:append_line("ONLY_CMAKE_FIND_ROOT_PATH")
                 else
-                    writer:write_line("NO_CMAKE_FIND_ROOT_PATH")
+                    builder:append_line("NO_CMAKE_FIND_ROOT_PATH")
                 end
             end
 
-            writer:modify_indent(-1):write_line(")")
+            builder:modify_indent(-1)
+                :append_line(")")
         end,
         context = self.m_config
     })

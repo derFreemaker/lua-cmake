@@ -10,8 +10,8 @@ function cmake._if(condition, body)
     cmake.generator.add_action({
         kind = kind,
         ---@param context { condition: string }
-        func = function(writer, context)
-            writer:write_line("if(", context.condition, ")")
+        func = function(builder, context)
+            builder:append_line("if(", context.condition, ")")
         end,
         context = {
             condition = condition
@@ -25,8 +25,8 @@ function cmake._if(condition, body)
 
     local _endif_action = {
         kind = kind .. "_end",
-        func = function(writer)
-            writer:write_line("endif()")
+        func = function(builder)
+            builder:append_line("endif()")
         end,
         modify_indent_before = -1,
     }
@@ -42,8 +42,8 @@ function cmake._if(condition, body)
         cmake.generator.add_action({
             kind = kind .. "_elseif",
             ---@param context { condition: string }
-            func = function(writer, context)
-                writer:write_line("elseif(", context.condition, ")")
+            func = function(builder, context)
+                builder:append_line("elseif(", context.condition, ")")
             end,
             context = {
                 condition = elseif_condition
@@ -67,8 +67,8 @@ function cmake._if(condition, body)
         cmake.generator.add_action({
             kind = kind .. "_else",
             ---@param context { condition: string }
-            func = function(writer, context)
-                writer:write_line("else()")
+            func = function(builder, context)
+                builder:append_line("else()")
             end,
             modify_indent_before = -1,
             modify_indent_after = 1,
@@ -84,8 +84,6 @@ function cmake._if(condition, body)
     return elses
 end
 
---//TODO: add optimizer strat that removes the if if there are no actions in it.
---// can add 'NOT <condition>' to inverse
 ---@param value lua-cmake.gen.action<{ condition: string }>
 cmake.generator.optimizer.add_strat(kind, function(iter, value)
     if iter:next_is(kind .. "_end") then
@@ -107,7 +105,7 @@ cmake.generator.optimizer.add_strat(kind, function(iter, value)
         iter:remove_next()
     end
 
+    --//TODO: handle next kind elseif
     -- if iter:next_is(kind .. "_elseif") then
-    --     --//TODO: handle next on is elseif
     -- end
 end)

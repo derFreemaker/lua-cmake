@@ -1,5 +1,11 @@
 local utils = require("lua-cmake.utils")
 
+---@alias lua-cmake.dep.entry.state
+---|"not resolved"
+---|"checked"
+---|"resolved"
+---|"failed"
+
 ---@class lua-cmake.dep.entry.implement
 ---@field get_name fun() : string
 ---
@@ -16,10 +22,16 @@ local utils = require("lua-cmake.utils")
 ---@class lua-cmake.dep.entry
 ---@field impl lua-cmake.dep.entry.implement
 ---@field deps_queue string[] | nil
----@field state "not resolved" | "resolved" | "failed"
+---@field state lua-cmake.dep.entry.state
 
 ---@class lua-cmake.dep.entry_helper
 local entry_helper = {}
+
+---@param dep_name string
+---@param entry_name string
+function entry_helper.dep_not_found(dep_name, entry_name)
+    cmake.fatal_error("dependency '" .. dep_name .. "' not found in registry for entry: '" .. entry_name .. "'!")
+end
 
 ---@param entry_data lua-cmake.dep.entry.implement
 ---@return lua-cmake.dep.entry
@@ -53,7 +65,7 @@ function entry_helper.check_entry(entry_data)
     if entry.impl.get_deps and #entry.impl.get_deps() ~= 0 then
         entry.deps_queue = utils.table.copy(entry.impl.get_deps())
     else
-        cmake.log_verbose("resolved entry '" .. entry.impl.get_name() .. "'.")
+        cmake.log_verbose("entry '" .. entry.impl.get_name() .. "' has no dependencies no resolving needed.")
         entry.state = "resolved"
     end
 
@@ -68,7 +80,7 @@ function entry_helper.resolve_entry(entry)
 
             local dep_entry = cmake.registry.get_entry(dep)
             if not dep_entry then
-                cmake.fatal_error("dependency '" .. dep .. "' not found in registry for entry: '" .. entry.impl.get_name() .. "'!")
+                entry_helper.dep_not_found(dep, entry.impl.get_name())
             end
             ---@cast dep_entry -nil
 

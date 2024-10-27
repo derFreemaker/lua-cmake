@@ -11,8 +11,8 @@ function cmake.write(...)
     cmake.generator.add_action({
         kind = "write",
         ---@param context { str: string[] }
-        func = function(writer, context)
-            writer:write(table.unpack(context.str))
+        func = function(builder, context)
+            builder:append(table.unpack(context.str))
         end,
         context = {
             str = str
@@ -30,8 +30,8 @@ function cmake.write_line(...)
     cmake.generator.add_action({
         kind = "write_line",
         ---@param context { str: string[] }
-        func = function(writer, context)
-            writer:write_line(table.unpack(context.str))
+        func = function(builder, context)
+            builder:append_line(table.unpack(context.str))
         end,
         context = {
             str = str

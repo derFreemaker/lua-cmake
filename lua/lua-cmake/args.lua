@@ -85,17 +85,17 @@ do
 
     parser:flag("-d --verbose")
 
+    parser:flag("-f --force")
+
+    print("lua-cmake version 0.1")
     parser:flag("-v --version")
         :action(function()
-            print("lua-cmake version 0.1")
             os.exit(0)
         end)
-
-    --//TODO: add version flag
 end
 
----@alias lua-cmake.arguments.raw { project_dir: string, config: string, input: string | nil, output: string | nil, optimize: boolean | nil, verbose: boolean | nil }
----@alias lua-cmake.arguments { project_dir: string, config: string, input: string, output: string, optimize: boolean, verbose: boolean }
+---@alias lua-cmake.arguments.raw { project_dir: string, config: string, input: string | nil, output: string | nil, optimize: boolean | nil, verbose: boolean | nil, force: boolean | nil }
+---@alias lua-cmake.arguments { project_dir: string, config: string, input: string, output: string, optimize: boolean, verbose: boolean, force: boolean }
 
 ---@class lua-cmake.arguments.lib
 local arguments = {}
@@ -133,6 +133,9 @@ function arguments.resolve_args(args, config)
     end
     if not args.verbose then
         args.verbose = config.verbose
+    end
+    if not args.force then
+        args.force = false
     end
 
     ---@cast args lua-cmake.arguments

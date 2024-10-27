@@ -1,13 +1,13 @@
 cmake.version("3.28")
 
-cmake.targets.collection.objects({
+cmake.targets.common.library({
     name = "test_objects_collection",
     srcs = {
         "test_srcs.cpp",
     }
 })
 
-cmake.targets.cxx.library({
+cmake.targets.common.library({
     name = "test_lib",
     type = "static",
     exclude_from_all = true,
@@ -30,5 +30,5 @@ cmake.add_definition("testasd", "etsetasd")
 
 cmake._if("${CMAKE_BUILD_TYPE} STREQUAL \"Debug\"", function()
 end)._else(function ()
-    cmake.set("set", "sete")
+    cmake.set("TEST", "set")
 end)

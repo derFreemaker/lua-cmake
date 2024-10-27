@@ -12,21 +12,21 @@ function cmake.include(include, optional, result_var, no_policy_scope)
         kind = kind,
         ---@param context { include: string, optional: boolean, result_var: boolean, no_policy_scope: boolean, includes: table<string, true> }
         func = function(builder, context)
-            builder:write("include(", context.include)
+            builder:append("include(", context.include)
 
             if context.optional then
-                builder:write(" OPTIONAL")
+                builder:append(" OPTIONAL")
             end
 
             if context.result_var then
-                builder:write(" ", context.result_var)
+                builder:append(" ", context.result_var)
             end
 
             if context.no_policy_scope then
-                builder:write(" NO_POLICY_SCOPE")
+                builder:append(" NO_POLICY_SCOPE")
             end
 
-            builder:write_line(")")
+            builder:append_line(")")
         end,
         context = {
             include = include,

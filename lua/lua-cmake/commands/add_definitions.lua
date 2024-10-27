@@ -14,27 +14,26 @@ function cmake.add_definitions(...)
     cmake.generator.add_action({
         kind = kind,
         ---@param context { definitions: { [1]: string, [2]: string | nil }[], global_definitions: table<string, true> }
-        func = function(writer, context)
+        func = function(builder, context)
             if #context.definitions == 1 then
-                writer:write("add_definitions(", definitions[1][1])
+                builder:append("add_definitions(", definitions[1][1])
                 if definitions[1][2] then
-                    writer:write("=", definitions[1][2])
+                    builder:append("=", definitions[1][2])
                 end
-                writer:write_line(")")
+                builder:append_line(")")
             else
-                writer:write_line("add_definitions(")
+                builder:append_line("add_definitions(")
                 for _, definition in ipairs(context.definitions) do
-                    writer
-                        :write_indent()
-                        :write(definition[1])
+                    builder:append_indent()
+                        :append(definition[1])
 
                     if definition[2] then
-                        writer:write("=", definition[2])
+                        builder:append("=", definition[2])
                     end
 
-                    writer:write_line()
+                    builder:append_line()
                 end
-                writer:write_line(")")
+                builder:append_line(")")
             end
         end,
         context = {

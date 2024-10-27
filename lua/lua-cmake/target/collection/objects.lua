@@ -20,16 +20,17 @@ function objects_collection:__init(config)
     cmake.generator.add_action({
         kind = kind,
         ---@param context lua-cmake.target.collection.objects.config
-        func = function(writer, context)
+        func = function(builder, context)
             local name = utils.make_name_cmake_conform(context.name)
-            writer:write_line("add_library(" .. name .. " OBJECT")
+            builder:append_line("add_library(" .. name .. " OBJECT")
             for _, src in ipairs(context.srcs) do
-                writer:write_indent():write_line("\"" .. src .. "\"")
+                builder:append_indent()
+                    :append_line("\"" .. src .. "\"")
             end
-            writer:write_line(")")
+            builder:append_line(")")
 
             if not utils.is_name_cmake_conform(context.name) then
-                writer:write_line("add_library(", context.name, " ALIAS ", name, ")")
+                builder:append_line("add_library(", context.name, " ALIAS ", name, ")")
             end
         end,
         context = self.config

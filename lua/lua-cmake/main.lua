@@ -1,6 +1,7 @@
 local lua_cmake_dir = os.getenv("LUA_CMAKE_DIR")
 if lua_cmake_dir == nil then
-    print("lua-cmake: LUA_CMAKE_DIR env variable not defined.\nhelp: https://github.com/derFreemaker/lua-cmake?tab=readme-ov-file#get-started")
+    print(
+    "lua-cmake: LUA_CMAKE_DIR env variable not defined.\nhelp: https://github.com/derFreemaker/lua-cmake?tab=readme-ov-file#get-started")
     os.exit(-1)
 end
 lua_cmake_dir = lua_cmake_dir:gsub("\\", "/")
@@ -56,6 +57,8 @@ if not lfs.exists(cmake.args.input) then
     cmake.fatal_error("config file not found: " .. cmake.args.input)
 end
 cmake.log_verbose("config file '" .. cmake.args.input .. "'")
+
+lfs.chdir(cmake.project_dir)
 
 local stopwatch = require("lua-cmake.utils.stopwatch")
 local sw_total = stopwatch()
@@ -135,7 +138,9 @@ do
     local has_error = cmake.generator.generate(writer)
     if has_error then
         cmake.log("generator finished with error(s)")
-        cmake_file:write("\nmessage(FATAL_ERROR \"lua-cmake generator failed with error(s)\")")
+        if not cmake.args.force then
+            cmake_file:write("\nmessage(FATAL_ERROR \"lua-cmake generator failed with error(s)\")")
+        end
     end
 
     cmake_file:close()
@@ -146,3 +151,5 @@ end
 
 sw_total:stop()
 cmake.log("total " .. sw_total:get_pretty_seconds() .. "s")
+
+lfs.chdir(current_dir)

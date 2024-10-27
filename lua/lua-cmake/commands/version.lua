@@ -93,7 +93,7 @@ cmake.generator.add_action({
     kind = "cmake.version",
     ---@param context { get_version: fun() : string }
     func = function(builder, context)
-        builder:write_line("cmake_minimum_required(VERSION ", context.get_version(), " FATAL_ERROR)")
+        builder:append_line("cmake_minimum_required(VERSION ", context.get_version(), " FATAL_ERROR)")
     end,
     context = {
         get_version = cmake.get_version,

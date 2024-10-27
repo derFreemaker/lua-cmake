@@ -14,19 +14,18 @@ function cmake.include_directories(...)
     cmake.generator.add_action({
         kind = kind,
         ---@param context { dirs: string[], include_directories: table<string, true> }
-        func = function(writer, context)
+        func = function(builder, context)
             if #context.dirs == 1 then
-                writer:write_line("include_directories(", context.dirs[1], ")")
+                builder:append_line("include_directories(", context.dirs[1], ")")
                 return
             end
 
-            writer:write_line("include_directories(")
+            builder:append_line("include_directories(")
             for _, dir in ipairs(context.dirs) do
-                writer
-                    :write_indent()
-                    :write_line(dir)
+                builder:append_indent()
+                    :append_line(dir)
             end
-            writer:write_line(")")
+            builder:append_line(")")
         end,
         context = {
             dirs = dirs,
