@@ -1,2 +1,2 @@
 @echo off
-lua %LUA_CMAKE_DIR%/main.lua %*
+lua %LUA_CMAKE_DIR%/src/main.lua %*

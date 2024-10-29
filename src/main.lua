@@ -8,6 +8,7 @@ lua_cmake_dir = lua_cmake_dir:gsub("\\", "/")
 if lua_cmake_dir:sub(lua_cmake_dir:len()) ~= "/" then
     lua_cmake_dir = lua_cmake_dir .. "/"
 end
+lua_cmake_dir = lua_cmake_dir .. "src/"
 
 ---@return "windows" | "linux"
 local function get_os()
