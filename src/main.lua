@@ -1,14 +1,15 @@
-local lua_cmake_dir = os.getenv("LUA_CMAKE_DIR")
-if lua_cmake_dir == nil then
-    print(
-        "lua-cmake: LUA_CMAKE_DIR env variable not defined.\nhelp: https://github.com/derFreemaker/lua-cmake?tab=readme-ov-file#get-started")
-    os.exit(-1)
+---@param lua_cmake_dir string
+---@param ... string
+---@return string, string[]
+local function sepperate_args(lua_cmake_dir, ...)
+    return lua_cmake_dir, { ... }
 end
+local lua_cmake_dir, args = sepperate_args(...)
 lua_cmake_dir = lua_cmake_dir:gsub("\\", "/")
 if lua_cmake_dir:sub(lua_cmake_dir:len()) ~= "/" then
     lua_cmake_dir = lua_cmake_dir .. "/"
 end
-lua_cmake_dir = lua_cmake_dir .. "src/"
+lua_cmake_dir = lua_cmake_dir
 
 ---@return "windows" | "linux"
 local function get_os()
@@ -31,15 +32,21 @@ local function setup_path(path, package_path, package_cpath)
     package.path = package.path .. ";" .. path .. package_path .. "/?.lua"
     package.cpath = package.cpath .. ";" .. path .. package_cpath .. "/?" .. dynamic_lib_ext
 end
-setup_path(lua_cmake_dir, "lua", "lib")
+setup_path(lua_cmake_dir, "src/lua", "lib")
 
-local version = loadfile(lua_cmake_dir .. "version.lua")()
-print("lua-cmake version " .. version)
+do
+    local version_file = io.open(lua_cmake_dir .. "VERSION", "r")
+    if not version_file then
+        error("unable to open version file!")
+    end
+    local version = version_file:read("l")
+    print("lua-cmake version " .. version)
+end
 
 ---@type boolean, lfs
 local lfs_status, lfs = pcall(require, "lfs")
 if not lfs_status then
-    error("failed to load LuaFileSystem library: " .. lfs)
+    error("failed to load LuaFileSystem library:\n" .. lfs)
 end
 local current_dir = lfs.currentdir()
 if not current_dir then
@@ -47,25 +54,28 @@ if not current_dir then
 end
 
 require("lua-cmake.third_party.derFreemaker.class_system")
+local cmake = require("lua-cmake.cmake")(args)
+
 local utils = require("lua-cmake.utils")
 local string_writer = require("lua-cmake.utils.string_writer")
 local plugins = require("lua-cmake.plugins")
 
---//? We are loading cmake like this to pass the varargs to it.
-loadfile(lua_cmake_dir .. "lua/lua-cmake/cmake.lua")(...)
+print(lua_cmake_dir)
+print(package.path)
+print(package.cpath)
+os.exit(-1)
 
 if cmake.args.force then
     cmake.log("force generating...")
 end
-
--- add project_dir path to front of require paths
-utils.add_require_path(cmake.project_dir, "", "", true)
 
 if not lfs.exists(cmake.args.input) then
     cmake.fatal_error("config file not found: " .. cmake.args.input)
 end
 cmake.log_verbose("config file '" .. cmake.args.input .. "'")
 
+-- add project_dir path to front of require paths and change working directory
+utils.add_require_path(cmake.project_dir, "", "", true)
 lfs.chdir(cmake.project_dir)
 
 local stopwatch = require("lua-cmake.utils.stopwatch")
