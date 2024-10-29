@@ -54,6 +54,10 @@ local plugins = require("lua-cmake.plugins")
 --//? We are loading cmake like this to pass the varargs to it.
 loadfile(lua_cmake_dir .. "lua/lua-cmake/cmake.lua")(...)
 
+if cmake.args.force then
+    cmake.log("force generating...")
+end
+
 -- add project_dir path to front of require paths
 utils.add_require_path(cmake.project_dir, "", "", true)
 
