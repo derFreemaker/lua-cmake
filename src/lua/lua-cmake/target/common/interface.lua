@@ -13,7 +13,6 @@ local target_options = require("lua-cmake.target.options")
 local kind = "lua-cmake.target.interface"
 ---@class lua-cmake.target.interface : object
 ---@field config lua-cmake.target.interface.config
----@field links string[]
 ---@overload fun(config: lua-cmake.target.interface.config) : lua-cmake.target.interface
 local interface = {}
 
@@ -48,6 +47,10 @@ function interface:__init(config)
                 self.config.options.precompile_headers[index] = cmake.path_resolver.resolve_path(hdr_group)
             end
         end
+    end
+
+    if not self.config.options.link_libraries then
+        self.config.options.link_libraries = {}
     end
 
     if not self.config.deps then
@@ -87,16 +90,15 @@ function interface:__init(config)
         end,
         add_links = function(links)
             for _, link in ipairs(links) do
-                if utils.table.contains(self.links, link) then
+                if utils.table.contains(self.config.options.link_libraries, link) then
                     goto continue
                 end
 
-                table.insert(self.links, link)
+                table.insert(self.config.options.link_libraries, link)
 
                 ::continue::
             end
         end,
-
         on_dep = function(entry)
             entry.add_links({ self.config.name })
         end

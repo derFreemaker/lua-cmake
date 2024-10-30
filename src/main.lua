@@ -60,11 +60,6 @@ local utils = require("lua-cmake.utils")
 local string_writer = require("lua-cmake.utils.string_writer")
 local plugins = require("lua-cmake.plugins")
 
-print(lua_cmake_dir)
-print(package.path)
-print(package.cpath)
-os.exit(-1)
-
 if cmake.args.force then
     cmake.log("force generating...")
 end

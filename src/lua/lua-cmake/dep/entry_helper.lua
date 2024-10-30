@@ -65,7 +65,7 @@ function entry_helper.check_entry(entry_data)
     if entry.impl.get_deps and #entry.impl.get_deps() ~= 0 then
         entry.deps_queue = utils.table.copy(entry.impl.get_deps())
     else
-        cmake.log_verbose("entry '" .. entry.impl.get_name() .. "' has no dependencies no resolving needed.")
+        cmake.log_verbose("entry '" .. entry.impl.get_name() .. "' has no dependencies, no resolving needed.")
         entry.state = "resolved"
     end
 

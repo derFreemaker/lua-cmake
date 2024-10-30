@@ -31,7 +31,7 @@ function registry.check_dependency(dep_name, reference_list)
 
     local dep_entry = registry.get_entry(dep_name)
     if not dep_entry then
-        entry_helper.dep_not_found(dep_name, reference_list[#reference_list])
+        entry_helper.dep_not_found(dep_name, reference_list[#reference_list - 1])
     end
     ---@cast dep_entry -nil
 
@@ -89,26 +89,22 @@ function registry.resolve()
     end)
 
     local has_error = false
-    local all_resolved = false
-    while not all_resolved do
-        all_resolved = true
-        for index, entry in ipairs(queue) do
+    while #queue ~= 0 do
+        for index, entry in pairs(queue) do
             cmake.log_verbose("resolving entry '" .. entry.impl.get_name() .. "'...")
             local entry_thread = coroutine.create(entry_helper.resolve_entry)
             local success, msg = coroutine.resume(entry_thread, entry)
             if not success then
                 has_error = true
-                cmake.error("when resolving entry '" .. entry.impl.get_name() .. "':\n"
-                    .. debug.traceback(entry_thread, msg))
-
                 entry.state = "failed"
                 queue[index] = nil
+
+                cmake.error("when resolving entry '" .. entry.impl.get_name() .. "':\n"
+                    .. debug.traceback(entry_thread, msg))
             end
 
             if entry.state == "resolved" then
                 queue[index] = nil
-            else
-                all_resolved = false
             end
         end
     end
