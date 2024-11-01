@@ -1,5 +1,4 @@
 local utils = require("lua-cmake.utils")
-local target_options = require("lua-cmake.target.options")
 
 ---@class lua-cmake.target.interface.config
 ---@field name string

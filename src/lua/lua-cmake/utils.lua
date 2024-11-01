@@ -1,4 +1,4 @@
-local utils = require("lua-cmake.third_party.derFreemaker.utils")
+local utils = require("lua-cmake.third_party.utils")
 ---@cast utils Freemaker.utils
 
 ---@class lua-cmake.utils : Freemaker.utils

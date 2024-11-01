@@ -53,7 +53,7 @@ if not current_dir then
     error("was unable to get current dir.")
 end
 
-require("lua-cmake.third_party.derFreemaker.class_system")
+require("lua-cmake.third_party.class_system")
 local cmake = require("lua-cmake.cmake")(args)
 
 local utils = require("lua-cmake.utils")

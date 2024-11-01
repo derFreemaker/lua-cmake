@@ -1,7 +1,7 @@
 ---@type lfs
 local lfs = require("lfs")
 ---@type argparse
-local argparse = require("lua-cmake.third_party.mpeterv.argparse")
+local argparse = require("src.lua.lua-cmake.third_party.argparse")
 
 ---@return "windows" | "linux"
 local function get_os()
