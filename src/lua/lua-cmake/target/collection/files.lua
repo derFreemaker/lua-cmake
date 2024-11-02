@@ -1,30 +1,36 @@
----@class lua-cmake.target.collection.files.config
+local set = require("lua-cmake.utils.set")
+
+---@class lua-cmake.target.collection.files.config.create
 ---@field name string
 ---@field hdrs string[] | nil
 ---@field srcs string[] | nil
 
+---@class lua-cmake.target.collection.files.config
+---@field name string
+---@field hdrs lua-cmake.utils.set<string>
+---@field srcs lua-cmake.utils.set<string>
+
 local kind = "lua-cmake.target.collection.files"
 ---@class lua-cmake.target.collection.files : object
 ---@field config lua-cmake.target.collection.files.config
----@overload fun(config: lua-cmake.target.collection.files.config) : lua-cmake.target.collection.files
+---@overload fun(config: lua-cmake.target.collection.files.config.create) : lua-cmake.target.collection.files
 local files = {}
 
 ---@private
----@param config lua-cmake.target.collection.files.config
+---@param config lua-cmake.target.collection.files.config.create
 function files:__init(config)
+    ---@diagnostic disable-next-line: assign-type-mismatch
     self.config = config
 
     if self.config.hdrs then
         cmake.path_resolver.resolve_paths_implace(self.config.hdrs)
-    else
-        self.config.hdrs = {}
     end
+    self.config.hdrs = set(self.config.hdrs)
 
     if self.config.srcs then
         cmake.path_resolver.resolve_paths_implace(self.config.srcs)
-    else
-        self.config.srcs = {}
     end
+    self.config.srcs = set(self.config.srcs)
 
     cmake.registry.add_entry({
         get_name = function()
@@ -32,24 +38,15 @@ function files:__init(config)
         end,
 
         add_hdrs = function(new_hdrs)
-            for _, hdr in ipairs(new_hdrs) do
-                table.insert(self.config.hdrs, hdr)
-            end
+            self.config.hdrs:add_multiple(new_hdrs)
         end,
         add_srcs = function(new_srcs)
-            for _, src in ipairs(new_srcs) do
-                table.insert(self.config.srcs, src)
-            end
+            self.config.srcs:add_multiple(new_srcs)
         end,
 
         on_dep = function(entry)
-            if entry.add_hdrs then
-                entry.add_hdrs(self.config.hdrs)
-            end
-
-            if entry.add_srcs then
-                entry.add_srcs(self.config.srcs)
-            end
+            entry.add_hdrs(self.config.hdrs)
+            entry.add_srcs(self.config.srcs)
         end
     })
 end

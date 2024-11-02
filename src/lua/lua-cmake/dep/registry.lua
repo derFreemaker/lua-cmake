@@ -112,4 +112,7 @@ function registry.resolve()
     return has_error
 end
 
+function registry.ignore()
+end
+
 return registry

@@ -43,7 +43,7 @@
 ---@field [integer] string
 ---@field type "interface" | "private" | "public"
 
----@class lua-cmake.target.options
+---@class lua-cmake.target.options.create
 ---@field compile_definitions lua-cmake.target.options.compile_definition[] | nil
 ---@field compile_features lua-cmake.target.options.compile_feature[] | nil
 ---@field compile_options lua-cmake.target.options.compile_options | nil
@@ -52,6 +52,16 @@
 ---@field link_libraries string[] | nil
 ---@field link_options lua-cmake.target.options.link_options | nil
 ---@field precompile_headers lua-cmake.target.options.precompile_headers[] | string[] | nil
+
+---@class lua-cmake.target.options
+---@field compile_definitions lua-cmake.target.options.compile_definition[] | nil
+---@field compile_features lua-cmake.target.options.compile_feature[] | nil
+---@field compile_options lua-cmake.target.options.compile_options | nil
+---@field include_directories lua-cmake.target.options.include_directories | nil
+---@field link_directories lua-cmake.target.options.link_directories | nil
+---@field link_libraries lua-cmake.utils.set<string> | nil
+---@field link_options lua-cmake.target.options.link_options | nil
+---@field precompile_headers lua-cmake.utils.set<lua-cmake.target.options.precompile_headers | string> | nil
 
 --//TODO: rewrite options generation to allow validation
 
@@ -166,7 +176,7 @@ return function(builder, target, options, is_interface)
         builder:append_line(")")
     end
 
-    if options.precompile_headers and #options.precompile_headers ~= 0 then
+    if not options.precompile_headers:empty() and #options.precompile_headers ~= 0 then
         builder:append_line("target_precompile_headers(", target)
         for _, precompiled_headers in ipairs(options.precompile_headers) do
             if type(precompiled_headers) == "table" then

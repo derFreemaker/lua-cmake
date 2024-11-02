@@ -1,7 +1,8 @@
 local utils = require("lua-cmake.utils")
+local set = require("lua-cmake.utils.set")
 local target_options = require("lua-cmake.target.options")
 
----@class lua-cmake.target.cxx.executable.config
+---@class lua-cmake.target.common.executable.config.create
 ---@field name string
 ---@field srcs string[] | nil
 ---@field hdrs string[] | nil
@@ -9,34 +10,42 @@ local target_options = require("lua-cmake.target.options")
 ---@field win32 boolean | nil
 ---@field macosx_bundle boolean | nil
 ---@field exclude_from_all boolean | nil
----@field options lua-cmake.target.options | nil
+---@field options lua-cmake.target.options.create | nil
+
+---@class lua-cmake.target.common.executable.config
+---@field name string
+---@field srcs lua-cmake.utils.set<string>
+---@field hdrs lua-cmake.utils.set<string>
+---@field deps lua-cmake.utils.set<string>
+---@field win32 boolean | nil
+---@field macosx_bundle boolean | nil
+---@field exclude_from_all boolean | nil
+---@field options lua-cmake.target.options
 
 local kind = "lua-cmake.target.cxx.executable"
----@class lua-cmake.target.cxx.executable : object
----@field config lua-cmake.target.cxx.executable.config
----@overload fun(config: lua-cmake.target.cxx.executable.config) : lua-cmake.target.cxx.executable
+---@class lua-cmake.target.common.executable : object
+---@field config lua-cmake.target.common.executable.config
+---@overload fun(config: lua-cmake.target.common.executable.config) : lua-cmake.target.common.executable
 local executable = {}
 
----@alias lua-cmake.target.cxx.executable.constructor fun(config: lua-cmake.target.cxx.executable.config)
-
 ---@private
----@param config lua-cmake.target.cxx.executable.config
+---@param config lua-cmake.target.common.executable.config.create
 function executable:__init(config)
+    ---@diagnostic disable-next-line: assign-type-mismatch
     self.config = config
 
-    if not self.config.hdrs then
-        self.config.hdrs = {}
-    else
+    if self.config.hdrs then
         cmake.path_resolver.resolve_paths_implace(self.config.hdrs)
     end
+    self.config.hdrs = set(self.config.hdrs)
 
-    if not self.config.srcs then
-        self.config.srcs = {}
-    else
+    if self.config.srcs then
         cmake.path_resolver.resolve_paths_implace(self.config.srcs)
     end
+    self.config.srcs = set(self.config.srcs)
 
     if not self.config.options then
+        ---@diagnostic disable-next-line: missing-fields
         self.config.options = {}
     end
 
@@ -50,14 +59,10 @@ function executable:__init(config)
             end
         end
     end
+    self.config.options.precompile_headers = set(self.config.options.precompile_headers)
 
-    if not self.config.options.link_libraries then
-        self.config.options.link_libraries = {}
-    end
-
-    if not self.config.deps then
-        self.config.deps = {}
-    end
+    self.config.options.link_libraries = set(self.config.options.link_libraries)
+    self.config.deps = set(self.config.deps)
 
     cmake.registry.add_entry({
         get_name = function()
@@ -65,47 +70,23 @@ function executable:__init(config)
         end,
 
         add_hdrs = function(hdrs)
-            for _, hdr in ipairs(hdrs) do
-                if utils.table.contains(self.config.hdrs, hdr) then
-                    goto continue
-                end
-
-                table.insert(self.config.hdrs, hdr)
-
-                ::continue::
-            end
+            self.config.hdrs:add_multiple(hdrs)
         end,
         add_srcs = function(srcs)
-            for _, src in ipairs(srcs) do
-                if utils.table.contains(self.config.srcs, src) then
-                    goto continue
-                end
-
-                table.insert(self.config.srcs, src)
-
-                ::continue::
-            end
+            self.config.srcs:add_multiple(srcs)
         end,
         add_links = function(links)
-            for _, link in ipairs(links) do
-                if utils.table.contains(self.config.options.link_libraries, link) then
-                    goto continue
-                end
-
-                table.insert(self.config.options.link_libraries, link)
-
-                ::continue::
-            end
+            self.config.options.link_libraries:add_multiple(links)
         end,
 
         get_deps = function()
-            return self.config.deps
+            return self.config.deps:get()
         end,
     })
 
     cmake.generator.add_action({
         kind = kind,
-        ---@param context lua-cmake.target.cxx.executable.config
+        ---@param context lua-cmake.target.common.executable.config
         func = function(builder, context)
             local name = utils.make_name_cmake_conform(context.name)
             builder:append_line("add_executable(", name)

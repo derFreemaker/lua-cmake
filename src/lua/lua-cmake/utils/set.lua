@@ -15,9 +15,14 @@ local function array_insert(arr, value)
     return i
 end
 
----@class lua-cmake.utils.set<T> : { get: (fun(self: lua-cmake.utils.set<T>) : T[]), add: (fun(self: lua-cmake.utils.set<T>, value: T) : boolean, integer), remove: (fun(self: lua-cmake.utils.set<T>, value: T) : boolean) }
+---@class lua-cmake.utils.set<T> : { empty: (fun(self: lua-cmake.utils.set<T>) : boolean), get: (fun(self: lua-cmake.utils.set<T>) : T[]), add: (fun(self: lua-cmake.utils.set<T>, value: T) : boolean, integer), add_multiple: (fun(self: lua-cmake.utils.set<T>, value: T[])), remove: (fun(self: lua-cmake.utils.set<T>, value: T) : boolean) }
 ---@field data any[]
 local set = {}
+
+---@return boolean
+function set:empty()
+    return #self.data == 0
+end
 
 function set:get()
     return utils.table.copy(self.data)
@@ -31,6 +36,12 @@ function set:add(value)
     end
 
     return true, array_insert(self.data, value)
+end
+
+function set:add_multiple(t)
+    for key, value in pairs(t) do
+        self:add(value)
+    end
 end
 
 ---@return boolean
@@ -52,8 +63,10 @@ return function(arr)
     local data = arr or {}
     return setmetatable({
         data = data,
+        empty = set.empty,
         get = set.get,
         add = set.add,
+        add_multiple = set.add_multiple,
         remove = set.remove
     }, {
         __index = function(t, k)

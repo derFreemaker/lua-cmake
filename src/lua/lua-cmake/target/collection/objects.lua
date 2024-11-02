@@ -1,21 +1,28 @@
 local utils = require("lua-cmake.utils")
+local set = require("lua-cmake.utils.set")
+
+---@class lua-cmake.target.collection.objects.config.create
+---@field name string
+---@field srcs string[]
 
 ---@class lua-cmake.target.collection.objects.config
 ---@field name string
----@field srcs string[]
+---@field srcs lua-cmake.utils.set<string>
 
 local kind = "lua-cmake.targets.collection.objects"
 ---@class lua-cmake.target.collection.objects : object
 ---@field config lua-cmake.target.collection.objects.config
----@overload fun(config: lua-cmake.target.collection.objects.config) : lua-cmake.target.collection.objects
+---@overload fun(config: lua-cmake.target.collection.objects.config.create) : lua-cmake.target.collection.objects
 local objects_collection = {}
 
 ---@private
----@param config lua-cmake.target.collection.objects.config
+---@param config lua-cmake.target.collection.objects.config.create
 function objects_collection:__init(config)
-    self.config = utils.table.readonly(config)
+    ---@diagnostic disable-next-line: assign-type-mismatch
+    self.config = config
 
     cmake.path_resolver.resolve_paths_implace(self.config.srcs)
+    self.config.srcs = set(self.config.srcs)
 
     cmake.generator.add_action({
         kind = kind,
@@ -42,15 +49,7 @@ function objects_collection:__init(config)
         end,
 
         add_srcs = function(srcs)
-            for _, src in ipairs(srcs) do
-                if utils.table.contains(self.config.srcs) then
-                    goto continue
-                end
-
-                table.insert(self.config.srcs, src)
-
-                ::continue::
-            end
+            self.config.srcs:add_multiple(srcs)
         end,
 
         on_dep = function(entry)
