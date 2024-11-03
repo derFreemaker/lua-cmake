@@ -177,8 +177,8 @@ __bundler__.__files__["src.utils.table"] = function()
 	---@param value any
 	---@return boolean
 	function _table.contains(t, value)
-	    for _, tValue in pairs(t) do
-	        if value == tValue then
+	    for _, t_value in pairs(t) do
+	        if value == t_value then
 	            return true
 	        end
 	    end

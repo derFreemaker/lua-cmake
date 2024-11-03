@@ -12,15 +12,21 @@
 cmake = {
     targets = {
         collection = {
+            ---@type lua-cmake.target.collection.files
             files = require("lua-cmake.target.collection.files"),
+            ---@type lua-cmake.target.collection.objects
             objects = require("lua-cmake.target.collection.objects"),
         },
         common = {
+            ---@type lua-cmake.target.common.interface
             interface = require("lua-cmake.target.common.interface"),
+            ---@type lua-cmake.target.common.library
             library = require("lua-cmake.target.common.library"),
+            ---@type lua-cmake.target.common.executable
             executable = require("lua-cmake.target.common.executable"),
         },
         imported = {
+            ---@type lua-cmake.target.imported.package
             package = require("lua-cmake.target.imported.package"),
         },
     },

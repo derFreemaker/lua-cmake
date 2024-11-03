@@ -1,6 +1,6 @@
 local utils = require("lua-cmake.utils")
-local target_options = require("lua-cmake.target.options")
 local set = require("lua-cmake.utils.set")
+local target_options = require("lua-cmake.target.options")
 
 ---@class lua-cmake.target.common.library.config.create
 ---@field name string
@@ -106,12 +106,12 @@ function library:__init(config)
                     :append_line("EXCLUDE_FROM_ALL")
             end
 
-            for _, hdr in ipairs(context.hdrs) do
+            for _, hdr in ipairs(context.hdrs:get()) do
                 builder:append_indent()
                     :append_line("\"", hdr, "\"")
             end
 
-            for _, src in ipairs(context.srcs) do
+            for _, src in ipairs(context.srcs:get()) do
                 builder:append_indent()
                     :append_line("\"", src, "\"")
             end

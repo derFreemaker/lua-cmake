@@ -39,8 +39,8 @@ function registry.check_dependency(dep_name, reference_list)
         return
     end
 
-    if dep_entry.deps_queue then
-        for _, dep in ipairs(dep_entry.impl.get_deps()) do
+    if dep_entry.get_deps_queue then
+        for _, dep in ipairs(dep_entry.get_deps_queue()) do
             for entry_index, entry_name in ipairs(reference_list) do
                 if dep == entry_name then
                     utils.array.drop_front_implace(reference_list, entry_index - 1)
@@ -63,7 +63,7 @@ function registry.check_dependencies()
     end)
 
     for _, entry in ipairs(entries) do
-        if not entry.deps_queue then
+        if not entry.get_deps_queue then
             goto continue
         end
         local entry_name = entry.impl.get_name()

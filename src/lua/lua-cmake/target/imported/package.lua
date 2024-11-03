@@ -30,9 +30,9 @@ local utils = require("lua-cmake.utils")
 ---@field cmake_find_root_path "both" | "only" | "no" | nil
 
 local kind = "cmake.find_package"
----@class lua-cmake.imported.package : object
+---@class lua-cmake.target.imported.package : object
 ---@field private m_config lua-cmake.imported.package.config
----@overload fun(config: lua-cmake.imported.package.config, imports: string[] | nil) : lua-cmake.imported.package
+---@overload fun(config: lua-cmake.imported.package.config, imports: string[] | nil) : lua-cmake.target.imported.package
 local package = {}
 
 ---@private

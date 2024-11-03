@@ -1,5 +1,4 @@
 local utils = require("lua-cmake.utils")
-local table_insert = table.insert
 local table_remove = table.remove
 
 ---@generic T
@@ -11,6 +10,8 @@ local function array_insert(arr, value)
     for j in ipairs(arr) do
         i = j
     end
+    i = i + 1
+
     arr[i] = value
     return i
 end
@@ -39,7 +40,7 @@ function set:add(value)
 end
 
 function set:add_multiple(t)
-    for key, value in pairs(t) do
+    for _, value in pairs(t) do
         self:add(value)
     end
 end
@@ -69,10 +70,10 @@ return function(arr)
         add_multiple = set.add_multiple,
         remove = set.remove
     }, {
-        __index = function(t, k)
+        __index = function(_, k)
             return data[k]
         end,
-        __newindex = function(t, k, v)
+        __newindex = function(_, k, v)
             data[k] = v
         end
     })

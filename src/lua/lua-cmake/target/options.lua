@@ -91,7 +91,7 @@ return function(builder, target, options, is_interface)
         builder:append_line(")")
     end
 
-    if options.compile_features and #options.compile_features ~= nil then
+    if options.compile_features and #options.compile_features ~= 0 then
         builder:append_line("target_compile_features(", target)
         for _, feature in ipairs(options.compile_features) do
             builder:append_indent()
@@ -154,7 +154,7 @@ return function(builder, target, options, is_interface)
         builder:append_line(")")
     end
 
-    if options.link_libraries and #options.link_libraries ~= 0 then
+    if options.link_libraries and not options.link_libraries:empty() then
         builder:append_line("target_link_libraries(", target)
         for _, lib in ipairs(options.link_libraries) do
             builder:append_indent()
@@ -176,7 +176,7 @@ return function(builder, target, options, is_interface)
         builder:append_line(")")
     end
 
-    if not options.precompile_headers:empty() and #options.precompile_headers ~= 0 then
+    if options.precompile_headers and not options.precompile_headers:empty() then
         builder:append_line("target_precompile_headers(", target)
         for _, precompiled_headers in ipairs(options.precompile_headers) do
             if type(precompiled_headers) == "table" then

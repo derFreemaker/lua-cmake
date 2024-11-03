@@ -25,7 +25,7 @@ local target_options = require("lua-cmake.target.options")
 local kind = "lua-cmake.target.cxx.executable"
 ---@class lua-cmake.target.common.executable : object
 ---@field config lua-cmake.target.common.executable.config
----@overload fun(config: lua-cmake.target.common.executable.config) : lua-cmake.target.common.executable
+---@overload fun(config: lua-cmake.target.common.executable.config.create) : lua-cmake.target.common.executable
 local executable = {}
 
 ---@private
@@ -106,12 +106,12 @@ function executable:__init(config)
                     :append_line("EXCLUDE_FROM_ALL")
             end
 
-            for _, hdr in ipairs(context.hdrs) do
+            for _, hdr in ipairs(context.hdrs:get()) do
                 builder:append_indent()
                     :append_line("\"", hdr, "\"")
             end
 
-            for _, src in ipairs(context.srcs) do
+            for _, src in ipairs(context.srcs:get()) do
                 builder:append_indent()
                     :append_line("\"", src, "\"")
             end
