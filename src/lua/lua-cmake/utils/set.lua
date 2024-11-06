@@ -1,23 +1,7 @@
-local utils = require("lua-cmake.utils")
-local table_remove = table.remove
-
----@generic T
----@param arr T[]
----@param value T
----@return integer
-local function array_insert(arr, value)
-    local i = 0
-    for j in ipairs(arr) do
-        i = j
-    end
-    i = i + 1
-
-    arr[i] = value
-    return i
-end
+local table_insert = table.insert
 
 ---@class lua-cmake.utils.set<T> : { empty: (fun(self: lua-cmake.utils.set<T>) : boolean), get: (fun(self: lua-cmake.utils.set<T>) : T[]), add: (fun(self: lua-cmake.utils.set<T>, value: T) : boolean, integer), add_multiple: (fun(self: lua-cmake.utils.set<T>, value: T[])), remove: (fun(self: lua-cmake.utils.set<T>, value: T) : boolean) }
----@field data any[]
+---@field data table<any, true>
 local set = {}
 
 ---@return boolean
@@ -26,17 +10,21 @@ function set:empty()
 end
 
 function set:get()
-    return utils.table.copy(self.data)
+    local copy = {}
+    for value in pairs(self.data) do
+        table_insert(copy, value)
+    end
+    return copy
 end
 
 ---@return boolean
----@return integer
 function set:add(value)
-    if utils.table.contains(self.data, value) then
-        return false, -1
+    if self.data[value] == true then
+        return false
     end
 
-    return true, array_insert(self.data, value)
+    self.data[value] = true
+    return true
 end
 
 function set:add_multiple(t)
@@ -45,36 +33,17 @@ function set:add_multiple(t)
     end
 end
 
----@return boolean
 function set:remove(value)
-    for index, data_value in pairs(self.data) do
-        if data_value == value then
-            table_remove(self.data, index)
-            return true
-        end
-    end
-
-    return false
+    self.data[value] = nil
 end
 
 ---@generic T
 ---@param arr T[] | nil
 ---@return lua-cmake.utils.set<T>
 return function(arr)
-    local data = arr or {}
     return setmetatable({
-        data = data,
-        empty = set.empty,
-        get = set.get,
-        add = set.add,
-        add_multiple = set.add_multiple,
-        remove = set.remove
+        data = arr or {},
     }, {
-        __index = function(_, k)
-            return data[k]
-        end,
-        __newindex = function(_, k, v)
-            data[k] = v
-        end
+        __index = set,
     })
 end
