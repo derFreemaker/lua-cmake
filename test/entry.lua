@@ -4,6 +4,9 @@ cmake.targets.common.library({
     name = "test_objects_collection",
     srcs = {
         "test_srcs.cpp",
+    },
+    deps = {
+        "test_lib"
     }
 })
 

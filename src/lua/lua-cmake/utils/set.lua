@@ -1,6 +1,6 @@
 local table_insert = table.insert
 
----@class lua-cmake.utils.set<T> : { empty: (fun(self: lua-cmake.utils.set<T>) : boolean), get: (fun(self: lua-cmake.utils.set<T>) : T[]), add: (fun(self: lua-cmake.utils.set<T>, value: T) : boolean, integer), add_multiple: (fun(self: lua-cmake.utils.set<T>, value: T[])), remove: (fun(self: lua-cmake.utils.set<T>, value: T) : boolean) }
+---@class lua-cmake.utils.set<T> : { empty: (fun(self: lua-cmake.utils.set<T>) : boolean), get: (fun(self: lua-cmake.utils.set<T>) : T[]), add: (fun(self: lua-cmake.utils.set<T>, value: T)), add_multiple: (fun(self: lua-cmake.utils.set<T>, value: T[])), remove: (fun(self: lua-cmake.utils.set<T>, value: T) : boolean) }
 ---@field data table<any, true>
 local set = {}
 
@@ -17,22 +17,19 @@ function set:get()
     return copy
 end
 
----@return boolean
+---@param value any
 function set:add(value)
-    if self.data[value] == true then
-        return false
-    end
-
     self.data[value] = true
-    return true
 end
 
+---@param t any[]
 function set:add_multiple(t)
     for _, value in pairs(t) do
         self:add(value)
     end
 end
 
+---@param value any
 function set:remove(value)
     self.data[value] = nil
 end
@@ -41,8 +38,15 @@ end
 ---@param arr T[] | nil
 ---@return lua-cmake.utils.set<T>
 return function(arr)
+    local data = {}
+    if arr then 
+        for _, value in pairs(arr) do
+            data[value] = true
+        end
+    end
+
     return setmetatable({
-        data = arr or {},
+        data = data,
     }, {
         __index = set,
     })
