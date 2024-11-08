@@ -10,7 +10,8 @@ The goal is to make writing complex system in cmake easier by making you able to
 The way it works is it generates a cmake file based on the configuration, this makes you able to use all the cmake features.
 
 ## Get Started
-Use lua-cmake files in bin directory
+1. clone repo
+2. Use lua-cmake files in bin directory
 
 ## Usage
 Add `luacmake.lua`(default) in your repo root and everything can be configured over the `cmake` global.
