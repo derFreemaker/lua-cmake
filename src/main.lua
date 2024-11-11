@@ -11,12 +11,12 @@ if lua_cmake_dir:sub(lua_cmake_dir:len()) ~= "/" then
 end
 lua_cmake_dir = lua_cmake_dir
 
----@return "windows" | "linux"
+---@return "windows" | "unix"
 local function get_os()
     if package.config:sub(1, 1) == '\\' then
         return "windows"
     else
-        return "linux"
+        return "unix"
     end
 end
 

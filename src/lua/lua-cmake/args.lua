@@ -3,12 +3,12 @@ local lfs = require("lfs")
 ---@type argparse
 local argparse = require("lua-cmake.third_party.argparse")
 
----@return "windows" | "linux"
+---@return "windows" | "unix"
 local function get_os()
     if package.config:sub(1, 1) == '\\' then
         return "windows"
     else
-        return "linux"
+        return "unix"
     end
 end
 

@@ -4,12 +4,12 @@ local utils = require("lua-cmake.third_party.utils")
 ---@class lua-cmake.utils : Freemaker.utils
 utils = utils
 
----@return "windows" | "linux"
+---@return "windows" | "unix"
 function utils.get_os()
     if package.config:sub(1, 1) == '\\' then
         return "windows"
     else
-        return "linux"
+        return "unix"
     end
 end
 
