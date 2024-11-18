@@ -1,6 +1,6 @@
 local iterator = require("lua-cmake.perf.iterator")
 
----@alias lua-cmake.perf.strategy<T> fun(iter: lua-cmake.perf.actions_iterator, value: lua-cmake.gen.action<T>)
+---@alias lua-cmake.perf.strategy<T> fun(iter: lua-cmake.perf.actions_iterator, value: lua-cmake.gen.action.config<T>)
 
 ---@class lua-cmake.perf.optimizer
 ---@field private m_strategies table<string, lua-cmake.perf.strategy[]>
@@ -59,7 +59,7 @@ function optimizer.run_strategies(iter, index, kind, strategies)
 end
 
 ---@private
----@param actions lua-cmake.gen.action<any>[]
+---@param actions lua-cmake.gen.action.config<any>[]
 ---@return boolean has_error
 function optimizer.optimize(actions)
     local has_error = false

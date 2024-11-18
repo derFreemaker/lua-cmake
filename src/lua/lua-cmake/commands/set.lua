@@ -36,7 +36,7 @@ cmake.generator.optimizer.add_strat(kind, function(iter)
     local t = {}
 
     while iter:current() do
-        ---@type lua-cmake.gen.action<{ variable: string, value: string, parent_scope: boolean }>
+        ---@type lua-cmake.gen.action.config<{ variable: string, value: string, parent_scope: boolean }>
         local current = iter:current()
 
         local key = current.context.variable .. tostring(current.context.parent_scope)

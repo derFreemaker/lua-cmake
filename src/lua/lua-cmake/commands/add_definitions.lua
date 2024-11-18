@@ -50,7 +50,7 @@ function cmake.add_definition(name, value)
     cmake.add_definitions({ name, value })
 end
 
----@param value lua-cmake.gen.action<{ definitions: { [1]: string, [2]: string | nil }[], global_definitions: table<string, true> }>
+---@param value lua-cmake.gen.action.config<{ definitions: { [1]: string, [2]: string | nil }[], global_definitions: table<string, true> }>
 cmake.generator.optimizer.add_strat(kind, function(iter, value)
     local changed = false
 
@@ -87,12 +87,12 @@ cmake.generator.optimizer.add_strat(kind, function(iter, value)
     end
 end)
 
----@param value lua-cmake.gen.action<{ definitions: { [1]: string, [2]: string | nil }[], global_definitions: table<string, true> }>
+---@param value lua-cmake.gen.action.config<{ definitions: { [1]: string, [2]: string | nil }[], global_definitions: table<string, true> }>
 cmake.generator.optimizer.add_strat(kind, function(iter, value)
     while iter:next_is_same() do
         iter:increment()
 
-        ---@type lua-cmake.gen.action<{ definitions: { [1]: string, [2]: string | nil }[], global_definitions: table<string, true> }>
+        ---@type lua-cmake.gen.action.config<{ definitions: { [1]: string, [2]: string | nil }[], global_definitions: table<string, true> }>
         local current = iter:current()
         for _, definition in ipairs(current.context.definitions) do
             table.insert(value.context.definitions, definition)

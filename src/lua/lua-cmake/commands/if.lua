@@ -30,7 +30,7 @@ function cmake._if(condition, body)
         end,
         modify_indent_before = -1,
     }
-    cmake.generator.add_action(_endif_action)
+    local end_action = cmake.generator.add_action(_endif_action)
 
     ---@class lua-cmake.if.elses
     local elses = {}
@@ -38,7 +38,7 @@ function cmake._if(condition, body)
     ---@param elseif_condition string
     ---@param elseif_body fun()
     function elses._elseif(elseif_condition, elseif_body)
-        cmake.generator.remove_last_action()
+        end_action:remove()
         cmake.generator.add_action({
             kind = kind .. "_elseif",
             ---@param context { condition: string }
@@ -56,14 +56,14 @@ function cmake._if(condition, body)
             elseif_body()
         end
 
-        cmake.generator.add_action(_endif_action)
+        end_action = cmake.generator.add_action(_endif_action)
 
         return elses
     end
 
     ---@param else_body fun()
     function elses._else(else_body)
-        cmake.generator.remove_last_action()
+        end_action:remove()
         cmake.generator.add_action({
             kind = kind .. "_else",
             ---@param context { condition: string }
@@ -78,13 +78,13 @@ function cmake._if(condition, body)
             else_body()
         end
 
-        cmake.generator.add_action(_endif_action)
+        end_action = cmake.generator.add_action(_endif_action)
     end
 
     return elses
 end
 
----@param value lua-cmake.gen.action<{ condition: string }>
+---@param value lua-cmake.gen.action.config<{ condition: string }>
 cmake.generator.optimizer.add_strat(kind, function(iter, value)
     if iter:next_is(kind .. "_end") then
         iter:remove_current()

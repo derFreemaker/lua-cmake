@@ -30,7 +30,7 @@ function cmake.add_compile_options(...)
     })
 end
 
----@param value lua-cmake.gen.action<{ options: string[], compile_options: table<string, true> }>
+---@param value lua-cmake.gen.action.config<{ options: string[], compile_options: table<string, true> }>
 cmake.generator.optimizer.add_strat(kind, function(iter, value)
     local changed = false
 

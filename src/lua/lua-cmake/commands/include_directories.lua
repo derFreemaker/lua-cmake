@@ -35,7 +35,7 @@ function cmake.include_directories(...)
     })
 end
 
----@param value lua-cmake.gen.action<{ dirs: string[], include_directories: table<string, true> }>
+---@param value lua-cmake.gen.action.config<{ dirs: string[], include_directories: table<string, true> }>
 cmake.generator.optimizer.add_strat(kind, function(iter, value)
     local changed = false
 

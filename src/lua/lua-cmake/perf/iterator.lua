@@ -1,23 +1,22 @@
 ---@class lua-cmake.perf.actions_iterator : object
 ---@field private m_index integer
----@field private m_end integer
----@field private m_current lua-cmake.gen.action<any>
----@field private m_actions lua-cmake.gen.action<any>[]
+---@field private m_current lua-cmake.gen.action
+---@field private m_actions lua-cmake.gen.action[]
 ---@overload fun(actions: lua-cmake.gen.action<any>[]) : lua-cmake.perf.actions_iterator
 local iterator = {}
 
 ---@private
 ---@param actions lua-cmake.gen.action<any>[]
-function iterator:__init(actions)
+---@param _end integer
+function iterator:__init(actions, _end)
     self.m_index = 1
     self.m_actions = actions
-    self.m_end = #actions + 1
     self.m_current = self.m_actions[self.m_index]
 end
 
 ---@return boolean
 function iterator:empty()
-    return self.m_index == self.m_end
+    return self.m_index == cmake.generator.get_count()
 end
 
 ---@return integer
@@ -31,12 +30,12 @@ function iterator:set_index(index)
     self:increment()
 end
 
----@return lua-cmake.gen.action<any>
+---@return lua-cmake.gen.action.config<any>
 function iterator:current()
-    return self.m_current
+    return self.m_current.config
 end
 
----@return lua-cmake.gen.action<any>
+---@return lua-cmake.gen.action.config<any>
 function iterator:next()
     return self.m_actions[self.m_index + 1]
 end
@@ -63,11 +62,11 @@ function iterator:next_is_same()
         return false
     end
 
-    return next.kind == self.m_current.kind
+    return next.kind == self.m_current.config.kind
 end
 
 function iterator:increment()
-    while self.m_index < self.m_end do
+    while self.m_index < cmake.generator.get_count() do
         self.m_index = self.m_index + 1
         self.m_current = self.m_actions[self.m_index]
 
