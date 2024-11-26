@@ -1,0 +1,20 @@
+{
+    "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
+    "runtime.version": "Lua 5.3",
+    "runtime.pathStrict": true,
+    "Lua.diagnostics.globals": [
+        "cmake"
+    ],
+    "Lua.workspace.ignoreDir": [
+        ".vscode",
+        "bin"
+    ],
+    "Lua.runtime.path": [
+        "lua/?.lua",
+        "?.lua",
+
+        // We only add '.so' since lua queries for the right dynamic library it self
+        "lib/?.so"
+    ]
+}
+  
