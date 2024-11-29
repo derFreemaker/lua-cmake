@@ -6,7 +6,7 @@ local set = {}
 
 ---@return boolean
 function set:empty()
-    return #self.data == 0
+    return next(self.data) == nil
 end
 
 function set:get()
@@ -39,7 +39,7 @@ end
 ---@return lua-cmake.utils.set<T>
 return function(arr)
     local data = {}
-    if arr then 
+    if arr then
         for _, value in pairs(arr) do
             data[value] = true
         end

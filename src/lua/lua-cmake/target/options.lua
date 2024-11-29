@@ -156,7 +156,7 @@ return function(builder, target, options, is_interface)
 
     if options.link_libraries and not options.link_libraries:empty() then
         builder:append_line("target_link_libraries(", target)
-        for _, lib in ipairs(options.link_libraries) do
+        for _, lib in ipairs(options.link_libraries:get()) do
             builder:append_indent()
                 :append_line(lib)
         end
@@ -178,7 +178,7 @@ return function(builder, target, options, is_interface)
 
     if options.precompile_headers and not options.precompile_headers:empty() then
         builder:append_line("target_precompile_headers(", target)
-        for _, precompiled_headers in ipairs(options.precompile_headers) do
+        for _, precompiled_headers in ipairs(options.precompile_headers:get()) do
             if type(precompiled_headers) == "table" then
                 builder:modify_indent(1)
                     :append_line(precompiled_headers.type:upper())
