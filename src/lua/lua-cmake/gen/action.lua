@@ -14,6 +14,8 @@ function action:__init(config, generator)
     self.m_generator = generator
 
     self.id = generator.generate_id()
+    print("created action: " .. tostring(self.id))
+
     self.config = config
 end
 

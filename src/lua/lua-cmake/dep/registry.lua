@@ -89,8 +89,12 @@ function registry.resolve()
     end)
 
     local has_error = false
-    while #queue ~= 0 do
+    local empty = false
+    while not empty do
+        empty = true
         for index, entry in pairs(queue) do
+            empty = false
+
             cmake.log_verbose("resolving entry '" .. entry.impl.get_name() .. "'...")
             local entry_thread = coroutine.create(entry_helper.resolve_entry)
             local success, msg = coroutine.resume(entry_thread, entry)

@@ -14,6 +14,7 @@ local count = 0
 function generator.get_count()
     return count
 end
+
 ---@return integer
 function generator.generate_id()
     count = count + 1
@@ -34,32 +35,52 @@ function generator.remove_action(id)
 end
 
 ---@private
+---@param action lua-cmake.gen.action
+---@param writer lua-cmake.utils.string_writer
+---@return boolean has_error
+function generator.run_action(action, writer)
+    local config = action.config
+    if config.modify_indent_before then
+        writer:modify_indent(config.modify_indent_before --[[@as integer]])
+    end
+
+    local action_builder = string_builder()
+    action_builder:modify_indent(writer:get_indent())
+
+    cmake.log_verbose("running action: " .. tostring(action.id))
+    local action_thread = coroutine.create(config.func)
+    local success, msg = coroutine.resume(action_thread, action_builder, config.context)
+    if not success then
+        cmake.error("generator action " .. action.id .. " failed:\n" .. debug.traceback(action_thread, msg))
+        return true
+    else
+        writer:write_direct(action_builder:build())
+    end
+
+    if config.modify_indent_after then
+        writer:modify_indent(config.modify_indent_after)
+    end
+
+    return false
+end
+
+---@private
 ---@param writer lua-cmake.utils.string_writer
 ---@return boolean has_error
 function generator.generate(writer)
     local has_error = false
 
-    for index, action in ipairs(generator.m_actions) do
-        local config = action.config
-        if config.modify_indent_before then
-            writer:modify_indent(config.modify_indent_before --[[@as integer]])
+    local index = 1
+    while index <= count do
+        local action = generator.m_actions[index]
+        if not action then
+            goto continue
         end
 
-        local action_builder = string_builder()
-        action_builder:modify_indent(writer:get_indent())
+        generator.run_action(action, writer)
 
-        local action_thread = coroutine.create(config.func)
-        local success, msg = coroutine.resume(action_thread, action_builder, config.context)
-        if not success then
-            has_error = true
-            cmake.error("generator action " .. index .. " failed:\n" .. debug.traceback(action_thread, msg))
-        else
-            writer:write_direct(action_builder:build())
-        end
-
-        if config.modify_indent_after then
-            writer:modify_indent(config.modify_indent_after)
-        end
+        ::continue::
+        index = index + 1
     end
 
     return has_error
