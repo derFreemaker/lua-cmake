@@ -47,7 +47,6 @@ function generator.run_action(action, writer)
     local action_builder = string_builder()
     action_builder:modify_indent(writer:get_indent())
 
-    cmake.log_verbose("running action: " .. tostring(action.id))
     local action_thread = coroutine.create(config.func)
     local success, msg = coroutine.resume(action_thread, action_builder, config.context)
     if not success then
