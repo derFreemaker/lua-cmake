@@ -69,24 +69,22 @@ return function(args)
     cmake.registry = require("lua-cmake.dep.registry")
     cmake.generator = require("lua-cmake.gen.generator")
 
-    --------------
-    -- commands --
-    --------------
-    local function load_command(name)
-        require("lua-cmake.commands." .. name)
+    local commands = {
+        "add_definitions",
+        "add_subdirectory",
+        "compile_options",
+        "enable_testing",
+        "if",
+        "include_directories",
+        "include",
+        "project",
+        "set",
+        "version",
+        "write",
+    }
+    for _, command in ipairs(commands) do
+        require("lua-cmake.commands." .. command)
     end
-
-    load_command("add_definitions")
-    load_command("add_subdirectory")
-    load_command("compile_options")
-    load_command("enable_testing")
-    load_command("if")
-    load_command("include_directories")
-    load_command("include")
-    load_command("set")
-    load_command("version")
-    load_command("write")
-    load_command("project")
 
     return cmake
 end
