@@ -33,7 +33,6 @@ As prescribed in [config-dir](https://github.com/pi0/config-dir).
 - `plugins: string[]`: Plugins that need to be loaded before configuration starts. If one fails or is missing `lua-cmake` will stop the process and report back. A plugin can be a `single file` or a `directory`, if a directory is given it will search for `init.lua` as entry point.
 
 ## Builtin
-- For filesystem interactions [lua-filesystem](https://lunarmodules.github.io/luafilesystem) is comming with it and can be required with `require("lfs")`.
 - In order to over engineer this a [class system](https://github.com/derFreemaker/lua-class-system) is builtin with the two gobal functions `class`, `interface`. (can be required with `require("lua-cmake.third_party.derFreemaker.class_system")`)
 - Metadata for all apis are included.
 
