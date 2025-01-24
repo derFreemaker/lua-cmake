@@ -9,6 +9,9 @@ Configure CMake in lua.
 The goal is to make writing complex system in cmake easier by making you able to configure in lua.
 The way it works is it generates a cmake file based on the configuration, this makes you able to use all the cmake features.
 
+## Required Dependecies
+- [lua-filesystem](https://lunarmodules.github.io/luafilesystem)
+
 ## Get Started
 1. clone repo
 2. Use lua-cmake files in bin directory

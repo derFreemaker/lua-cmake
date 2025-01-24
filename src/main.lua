@@ -11,28 +11,7 @@ if lua_cmake_dir:sub(lua_cmake_dir:len()) ~= "/" then
 end
 lua_cmake_dir = lua_cmake_dir
 
----@return "windows" | "unix"
-local function get_os()
-    if package.config:sub(1, 1) == '\\' then
-        return "windows"
-    else
-        return "unix"
-    end
-end
-
----@param path string
----@param package_path string
----@param package_cpath string
-local function setup_path(path, package_path, package_cpath)
-    local dynamic_lib_ext = ".so"
-    if get_os() == "windows" then
-        dynamic_lib_ext = ".dll"
-    end
-
-    package.path = package.path .. ";" .. path .. package_path .. "/?.lua"
-    package.cpath = package.cpath .. ";" .. path .. package_cpath .. "/?" .. dynamic_lib_ext
-end
-setup_path(lua_cmake_dir, "src/lua", "lib")
+package.path = package.path .. ";" .. lua_cmake_dir .. "src/lua/?.lua"
 
 do
     local version_file = io.open(lua_cmake_dir .. "VERSION", "r")
