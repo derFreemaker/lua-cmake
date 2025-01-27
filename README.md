@@ -1,5 +1,6 @@
-# NOT FINISHED & NOT RECOMMENDED.
+# NOT FINISHED & NOT RECOMMENDED
 Its a personal project there for its not good code or optimized.
+This is not regulary tested / used on linux there are linux needed files included like lfs.so for linux.
 
 # lua-cmake
 Configure CMake in lua.
@@ -7,6 +8,9 @@ Configure CMake in lua.
 ## Goal
 The goal is to make writing complex system in cmake easier by making you able to configure in lua.
 The way it works is it generates a cmake file based on the configuration, this makes you able to use all the cmake features.
+
+## Required Dependecies
+- [lua-filesystem](https://lunarmodules.github.io/luafilesystem)
 
 ## Get Started
 1. Clone the repo
@@ -30,7 +34,6 @@ As prescribed in [config-dir](https://github.com/pi0/config-dir).
 - `plugins: string[]`: Plugins that need to be loaded before configuration starts. If one fails or is missing `lua-cmake` will stop the process and report back. A plugin can be a `single file` or a `directory`, if a directory is given it will search for `init.lua` as entry point.
 
 ## Builtin
-- For filesystem interactions [lua-filesystem](https://lunarmodules.github.io/luafilesystem) is comming with it and can be required with `require("lfs")`.
 - In order to over engineer this a [class system](https://github.com/derFreemaker/lua-class-system) is builtin with the two gobal functions `class`, `interface`. (can be required with `require("lua-cmake.third_party.derFreemaker.class_system")`)
 - Metadata for all apis are included.
 

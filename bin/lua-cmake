@@ -1,3 +1,5 @@
 #!/bin/bash
 
-lua ${LUA_CMAKE_DIR}/lua/lua-cmake/main.lua "$@"
+PARENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
+
+lua ${PARENT_DIR}/src/main.lua "${PARENT_DIR}" "$@"

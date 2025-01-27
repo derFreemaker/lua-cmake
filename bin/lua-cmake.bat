@@ -1,2 +1,7 @@
 @echo off
-lua %LUA_CMAKE_DIR%/lua/lua-cmake/main.lua %*
+
+set "SCRIPT_DIR=%~dp0"
+set "PARENT_DIR=%SCRIPT_DIR:~0,-1%"
+for %%a in ("%PARENT_DIR%") do set "PARENT_DIR=%%~dpa"
+
+lua %PARENT_DIR%/src/main.lua %PARENT_DIR% %*
