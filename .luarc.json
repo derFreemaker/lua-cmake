@@ -13,8 +13,8 @@
         "lua/?.lua",
         "?.lua",
 
-        // We only add '.so' since lua queries for the right dynamic library it self
-        "lib/?.so"
+        // only for lsp
+        "src/lua/?.lua"
     ]
 }
   

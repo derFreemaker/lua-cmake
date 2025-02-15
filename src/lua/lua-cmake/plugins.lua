@@ -15,9 +15,9 @@ function plugins.load_plugin_file(path)
     ---@cast plugin_func -nil
 
     local plugin_thread = coroutine.create(plugin_func)
-    local success, run_msg = coroutine.resume(plugin_thread)
+    local success, err_msg = coroutine.resume(plugin_thread)
     if not success then
-        cmake.fatal_error("error while executing plugin: " .. path .. "\n" .. debug.traceback(plugin_thread, run_msg))
+        cmake.fatal_error("error while loading plugin: " .. path .. "\n" .. debug.traceback(plugin_thread, err_msg))
     end
 end
 
