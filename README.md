@@ -1,6 +1,5 @@
 # NOT FINISHED & NOT RECOMMENDED
 Its a personal project there for its not good code or optimized.
-This is not regulary tested / used on linux there are linux needed files included like lfs.so for linux.
 
 # lua-cmake
 Configure CMake in lua.
